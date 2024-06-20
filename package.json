@@ -1,17 +1,16 @@
 {
-  "name": "electron-vue-vite",
-  "version": "28.1.0",
+  "name": "bucket-browser",
+  "version": "0.0.1",
   "main": "dist-electron/main/index.js",
-  "description": "Really simple Electron + Vue + Vite boilerplate.",
-  "author": "草鞋没号 <308487730@qq.com>",
-  "license": "MIT",
-  "private": true,
+  "description": "A desktop app to browse S3 buckets",
+  "author": "Kyle Upton <kyleaupton@gmail.com>",
+  "license": "GPL-3.0-only",
   "keywords": [
-    "electron",
-    "rollup",
-    "vite",
-    "vue3",
-    "vue"
+    "s3",
+    "bucket",
+    "browser",
+    "desktop",
+    "app"
   ],
   "debug": {
     "env": {
