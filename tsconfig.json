@@ -2,8 +2,8 @@
   "compilerOptions": {
     "target": "ESNext",
     "useDefineForClassFields": true,
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "strict": true,
     "jsx": "preserve",
     "resolveJsonModule": true,
@@ -11,7 +11,21 @@
     "esModuleInterop": true,
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@main/*": [
+        "./electron/main/*"
+      ],
+      "@preload/*": [
+        "./electron/preload/*"
+      ],
+      "@shared/*": [
+        "./electron/shared/*"
+      ]
+    },
   },
   "include": ["src"],
   "references": [

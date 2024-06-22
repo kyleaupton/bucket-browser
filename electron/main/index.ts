@@ -1,10 +1,9 @@
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
-import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import os from 'node:os';
+import { registerIpcChannels } from '@main/ipc';
 
-const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // The built directory structure
@@ -79,7 +78,10 @@ async function createWindow() {
   // win.webContents.on('will-navigate', (event, url) => { }) #344
 }
 
-app.whenReady().then(createWindow);
+app.on('ready', () => {
+  registerIpcChannels();
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   win = null;

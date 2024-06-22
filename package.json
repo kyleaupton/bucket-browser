@@ -24,6 +24,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@rollup/plugin-alias": "^5.1.0",
     "@typescript-eslint/parser": "^7.13.1",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/eslint-config-typescript": "^13.0.0",
@@ -35,7 +36,7 @@
     "eslint-plugin-vue": "^9.26.0",
     "lowdb": "^7.0.1",
     "prettier": "^3.3.2",
-    "typed-electron-ipc": "^0.0.1-alpha.1",
+    "typed-electron-ipc": "^0.0.1-alpha.2",
     "typescript": "^5.4.2",
     "vite": "^5.1.5",
     "vite-plugin-electron": "^0.28.4",

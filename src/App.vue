@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { IpcChannel } from 'typed-electron-ipc/shared';
 import HelloWorld from './components/HelloWorld.vue';
 </script>
 

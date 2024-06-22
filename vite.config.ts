@@ -1,8 +1,27 @@
 import fs from 'node:fs';
+import path from 'node:path';
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
+import alias from '@rollup/plugin-alias';
 import electron from 'vite-plugin-electron/simple';
 import pkg from './package.json';
+
+const _alias = alias({
+  entries: [
+    {
+      find: '@main',
+      replacement: path.resolve(__dirname, './electron/main'),
+    },
+    {
+      find: '@preload',
+      replacement: path.resolve(__dirname, './electron/preload'),
+    },
+    {
+      find: '@shared',
+      replacement: path.resolve(__dirname, './electron/shared'),
+    },
+  ],
+});
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
@@ -34,6 +53,7 @@ export default defineConfig(({ command }) => {
               minify: isBuild,
               outDir: 'dist-electron/main',
               rollupOptions: {
+                plugins: [_alias],
                 // Some third-party Node.js libraries may not be built correctly by Vite, especially `C/C++` addons,
                 // we can use `external` to exclude them to ensure they work correctly.
                 // Others need to put them in `dependencies` to ensure they are collected into `app.asar` after the app is built.
@@ -55,6 +75,7 @@ export default defineConfig(({ command }) => {
               minify: isBuild,
               outDir: 'dist-electron/preload',
               rollupOptions: {
+                plugins: [_alias],
                 external: Object.keys(
                   'dependencies' in pkg ? pkg.dependencies : {},
                 ),
