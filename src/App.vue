@@ -1,9 +1,21 @@
 <template>
-  <div class="text-6xl">test</div>
+  <Splitter class="h-full">
+    <SplitterPanel :size="35" :min-size="20">
+      <Sidebar />
+    </SplitterPanel>
+    <SplitterPanel :size="65" :min-size="65">
+      <Browser />
+    </SplitterPanel>
+  </Splitter>
 </template>
 
 <script setup lang="ts">
+import Splitter from 'primevue/splitter';
+import SplitterPanel from 'primevue/splitterpanel';
+
 import { useConnectionsStore } from '@/stores/connections';
+import Sidebar from '@/components/Sidebar.vue';
+import Browser from '@/components/Browser.vue';
 
 const connectionsStore = useConnectionsStore();
 connectionsStore
@@ -12,28 +24,9 @@ connectionsStore
 </script>
 
 <style>
-.flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-
-.logo.electron:hover {
-  filter: drop-shadow(0 0 2em #9feaf9);
-}
-
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+#app {
+  height: 100vh;
+  width: 100vw;
+  padding: 12px;
 }
 </style>

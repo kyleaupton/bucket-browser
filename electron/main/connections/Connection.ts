@@ -1,7 +1,8 @@
-import { S3Client, S3ClientConfigType } from '@aws-sdk/client-s3';
+import { S3Client, ListBucketsCommand } from '@aws-sdk/client-s3';
 import {
   SerializedConnection,
   PersistedConnection,
+  PersistedConnectionConfig,
 } from '@shared/types/connections';
 
 /**
@@ -10,7 +11,7 @@ import {
 export default class Connection {
   id: string;
   nickname: string;
-  config: S3ClientConfigType;
+  config: PersistedConnectionConfig;
   client: S3Client;
 
   constructor(connection: PersistedConnection) {
@@ -20,6 +21,12 @@ export default class Connection {
 
     this.client = new S3Client(this.config);
   }
+
+  listBuckets() {
+    return this.client.send(new ListBucketsCommand());
+  }
+
+  listObjects() {}
 
   serialize(): SerializedConnection {
     return {
