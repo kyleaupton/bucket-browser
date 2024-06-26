@@ -1,3 +1,7 @@
+<template>
+  <div class="text-6xl">test</div>
+</template>
+
 <script setup lang="ts">
 import { useConnectionsStore } from '@/stores/connections';
 
@@ -6,28 +10,6 @@ connectionsStore
   .getConnections()
   .then(() => console.log(connectionsStore.connections));
 </script>
-
-<template>
-  <div>
-    <a href="https://www.electronjs.org/" target="_blank">
-      <img
-        src="./assets/electron.svg"
-        class="logo electron"
-        alt="Electron logo"
-      />
-    </a>
-    <a href="https://vitejs.dev/" target="_blank">
-      <img src="./assets/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <div class="flex-center">
-    Place static files into the <code>/public</code> folder
-    <img style="width: 2.4em; margin-left: 0.4em" src="/logo.svg" alt="Logo" />
-  </div>
-</template>
 
 <style>
 .flex-center {

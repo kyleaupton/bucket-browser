@@ -18,5 +18,8 @@ module.exports = {
   rules: {
     // Required
     'prettier/prettier': 'error',
+
+    // Optional
+    'vue/multi-word-component-names': 'off',
   },
 };
