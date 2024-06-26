@@ -2,6 +2,7 @@ import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import os from 'node:os';
+
 import { registerIpcChannels } from '@main/ipc';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

@@ -1,4 +1,4 @@
-import { IpcChannel } from 'typed-electron-ipc/dist/shared';
+import { IpcChannel } from 'typed-electron-ipc';
 import { Connection } from '@shared/types/connections';
 
 export const getConnectionsChannel: IpcChannel<[], Connection[]> = {
