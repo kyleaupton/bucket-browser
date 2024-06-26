@@ -1,6 +1,6 @@
 import { IpcChannel } from 'typed-electron-ipc';
-import { Connection } from '@shared/types/connections';
+import { SerializedConnection } from '@shared/types/connections';
 
-export const getConnectionsChannel: IpcChannel<[], Connection[]> = {
+export const getConnectionsChannel: IpcChannel<[], SerializedConnection[]> = {
   name: '/connections/get',
 };

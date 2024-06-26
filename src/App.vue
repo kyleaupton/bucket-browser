@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { setArgsTransform } from 'typed-electron-ipc';
-import { deepToRaw } from './utils';
+import { useConnectionsStore } from '@/stores/connections';
 
-setArgsTransform((...args) => {
-  return args.map(deepToRaw);
-});
+const connectionsStore = useConnectionsStore();
+connectionsStore
+  .getConnections()
+  .then(() => console.log(connectionsStore.connections));
 </script>
 
 <template>

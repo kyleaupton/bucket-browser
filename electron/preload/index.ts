@@ -1,12 +1,12 @@
 import { contextBridge } from 'electron';
-import { ipcInvoke } from 'typed-electron-ipc';
+import { ipcInvoke, IpcChannel } from 'typed-electron-ipc';
 
-import { getConnectionsChannel } from '@shared/ipc/connections';
-
-export const api = {
-  getConnections: () => {
-    return ipcInvoke(getConnectionsChannel);
-  },
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const _ipcInvoke = async <P extends any[], R>(
+  channel: IpcChannel<P, R>,
+  ...args: P
+): Promise<R> => {
+  return ipcInvoke(channel, ...args);
 };
 
-contextBridge.exposeInMainWorld('api', api);
+contextBridge.exposeInMainWorld('ipcInvoke', _ipcInvoke);

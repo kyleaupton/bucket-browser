@@ -32,6 +32,14 @@ export default defineConfig(({ command }) => {
   const sourcemap = isServe || !!process.env.VSCODE_DEBUG;
 
   return {
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+        '@main': path.resolve(__dirname, './electron/main'),
+        '@preload': path.resolve(__dirname, './electron/preload'),
+        '@shared': path.resolve(__dirname, './electron/shared'),
+      },
+    },
     plugins: [
       vue(),
       electron({
@@ -49,6 +57,7 @@ export default defineConfig(({ command }) => {
           },
           vite: {
             build: {
+              target: 'esnext',
               sourcemap,
               minify: isBuild,
               outDir: 'dist-electron/main',
@@ -71,6 +80,7 @@ export default defineConfig(({ command }) => {
           input: 'electron/preload/index.ts',
           vite: {
             build: {
+              target: 'esnext',
               sourcemap: sourcemap ? 'inline' : undefined, // #332
               minify: isBuild,
               outDir: 'dist-electron/preload',

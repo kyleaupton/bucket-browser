@@ -3,7 +3,31 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import os from 'node:os';
 
+// import db from '@main/db';
 import { registerIpcChannels } from '@main/ipc';
+import { initializeConnections } from '@main/connections';
+
+// await db.update((data) => {
+//   const item = {
+//     id: 'test-server',
+//     nickname: 'cs-dev-edge-01.local',
+//     config: {
+//       endpoint: 'http://cs-dev-edge-01.local:7070',
+//       credentials: {
+//         accessKeyId: 'test',
+//         secretAccessKey: 'test',
+//       },
+//     },
+//   };
+
+//   const index = data.connections.findIndex((conn) => conn.id === item.id);
+
+//   if (index === -1) {
+//     data.connections.push(item);
+//   } else {
+//     data.connections[index] = item;
+//   }
+// });
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -48,12 +72,6 @@ async function createWindow() {
     icon: path.join(process.env.VITE_PUBLIC, 'favicon.ico'),
     webPreferences: {
       preload,
-      // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
-      // nodeIntegration: true,
-
-      // Consider using contextBridge.exposeInMainWorld
-      // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation
-      // contextIsolation: false,
     },
   });
 
@@ -80,6 +98,7 @@ async function createWindow() {
 }
 
 app.on('ready', () => {
+  initializeConnections();
   registerIpcChannels();
   createWindow();
 });

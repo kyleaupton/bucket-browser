@@ -3,10 +3,10 @@ import path from 'path';
 import { Low } from 'lowdb';
 import { JSONFile } from 'lowdb/node';
 
-import { Connection } from '@shared/types/connections';
+import { PersistedConnection } from '@shared/types/connections';
 
 export type Data = {
-  connections: Connection[];
+  connections: PersistedConnection[];
 };
 
 const defaults: Data = {
@@ -17,5 +17,7 @@ const dbPath = path.join(app.getPath('userData'), 'db.json');
 
 const adapter = new JSONFile<Data>(dbPath);
 const db = new Low<Data>(adapter, defaults);
+
+await db.read();
 
 export default db;
