@@ -1,32 +1,27 @@
 <template>
-  <Splitter class="h-full">
-    <SplitterPanel :size="35" :min-size="20">
-      <Sidebar />
-    </SplitterPanel>
-    <SplitterPanel :size="65" :min-size="65">
-      <Browser />
-    </SplitterPanel>
-  </Splitter>
+  <Titlebar />
+  <Main />
+  <Dialog />
 </template>
 
 <script setup lang="ts">
-import Splitter from 'primevue/splitter';
-import SplitterPanel from 'primevue/splitterpanel';
-
+import Titlebar from '@/components/Titlebar.vue';
+import Main from '@/views/Main.vue';
+import Dialog from '@/components/dialog/Dialog.vue';
 import { useConnectionsStore } from '@/stores/connections';
-import Sidebar from '@/components/Sidebar.vue';
-import Browser from '@/components/Browser.vue';
+import { serialize } from './utils';
 
 const connectionsStore = useConnectionsStore();
-connectionsStore
-  .getConnections()
-  .then(() => console.log(connectionsStore.connections));
+connectionsStore.getConnections();
+
+window.serialize = serialize;
 </script>
 
 <style>
 #app {
+  display: flex;
+  flex-direction: column;
   height: 100vh;
   width: 100vw;
-  padding: 12px;
 }
 </style>

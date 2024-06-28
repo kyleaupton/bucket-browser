@@ -7,25 +7,29 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
+import { Bucket } from '@aws-sdk/client-s3';
 import { listBucketsChannel } from '@shared/ipc/connections';
 import { useConnectionsStore } from '@/stores/connections';
 
 const { selectedConnection } = storeToRefs(useConnectionsStore());
 
-const buckets = ref([]);
+const buckets = ref<Bucket[]>([]);
 
-if (selectedConnection) {
-  watch(selectedConnection, async () => {
-    if (selectedConnection.value) {
+watch(selectedConnection, async () => {
+  if (selectedConnection.value) {
+    try {
       const res = await window.ipcInvoke(
         listBucketsChannel,
         selectedConnection.value,
       );
 
-      console.log(res);
+      buckets.value = res.Buckets || [];
+      console.log(buckets.value);
+    } catch (e) {
+      console.error(e);
     }
-  });
-}
+  }
+});
 </script>
 
 <style scoped></style>

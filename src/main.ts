@@ -12,6 +12,9 @@ createApp(App)
   .use(PrimeVue, {
     theme: {
       preset: Aura,
+      options: {
+        primary: 'noir',
+      },
     },
   })
   .mount('#app')

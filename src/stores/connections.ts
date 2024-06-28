@@ -3,7 +3,7 @@ import { getConnectionsChannel } from '@shared/ipc/connections';
 import { SerializedConnection } from '@shared/types/connections';
 
 type State = {
-  selectedConnection?: string;
+  selectedConnection: string | undefined;
   connections: SerializedConnection[];
 };
 

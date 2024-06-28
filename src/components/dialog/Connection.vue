@@ -1,0 +1,143 @@
+<template>
+  <Dialog
+    v-model:visible="visible"
+    modal
+    :header="title"
+    :style="{ width: '25rem' }"
+  >
+    <div class="flex items-center gap-4 mb-4">
+      <label for="name" class="font-semibold w-24">Name</label>
+      <InputText
+        id="name"
+        v-model="persistedConnection.nickname"
+        class="flex-auto"
+        size="small"
+      />
+    </div>
+
+    <div class="flex items-center gap-4 mb-4">
+      <label for="endpoint" class="font-semibold w-24">Endpoint</label>
+      <InputText
+        id="endpoint"
+        v-model="persistedConnection.config.endpoint"
+        class="flex-auto"
+        size="small"
+      />
+    </div>
+
+    <div class="flex items-center gap-4 mb-4">
+      <label for="access-key" class="font-semibold w-24">Access Key</label>
+      <InputText id="access-key" class="flex-auto" size="small" />
+    </div>
+
+    <div class="flex items-center gap-4 mb-4">
+      <label for="secret-key" class="font-semibold w-24">Secret Key</label>
+      <InputText id="secret-key" class="flex-auto" size="small" />
+    </div>
+
+    <div class="flex items-center gap-4 mb-4">
+      <label for="path-style" class="font-semibold">Force Path Style</label>
+      <ToggleSwitch id="path-style" />
+    </div>
+
+    <div class="flex justify-end gap-2">
+      <Button
+        type="button"
+        label="Cancel"
+        severity="secondary"
+        @click="layoutStore.closeDialog()"
+      ></Button>
+      <Button
+        type="button"
+        label="Save"
+        severity="contrast"
+        :disabled="disabled"
+        @click="save"
+      ></Button>
+    </div>
+  </Dialog>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import { storeToRefs } from 'pinia';
+import { nanoid } from 'nanoid';
+import Dialog from 'primevue/dialog';
+import InputText from 'primevue/inputtext';
+import ToggleSwitch from 'primevue/toggleswitch';
+import Button from 'primevue/button';
+import {
+  addConnectionChannel,
+  editConnectionChannel,
+} from '@shared/ipc/connections';
+import { PersistedConnection } from '@shared/types/connections';
+import { useLayoutStore, useConnectionsStore } from '@/stores';
+import { watch } from 'vue';
+
+const layoutStore = useLayoutStore();
+const connectionsStore = useConnectionsStore();
+const { dialog } = storeToRefs(layoutStore);
+
+const visible = computed({
+  get: () => {
+    return dialog?.value?.name === 'connection';
+  },
+  set: (val: boolean) => {
+    if (val === false) {
+      layoutStore.closeDialog();
+    }
+  },
+});
+
+const defaultConnection: PersistedConnection = {
+  id: nanoid(),
+  nickname: '',
+  config: {
+    region: 'us-east-1',
+    endpoint: 'https://s3.amazonaws.com',
+    credentials: {
+      accessKeyId: '',
+      secretAccessKey: '',
+    },
+  },
+};
+
+const persistedConnection = ref<PersistedConnection>(defaultConnection);
+
+watch(visible, () => {
+  if (dialog?.value?.data) {
+    persistedConnection.value = dialog.value.data;
+  } else {
+    persistedConnection.value = defaultConnection;
+  }
+});
+
+const newConnection = computed(() => dialog?.value?.data === undefined);
+
+const disabled = computed(() => {
+  return (
+    !persistedConnection.value.nickname ||
+    !persistedConnection.value.config.endpoint
+  );
+});
+
+const title = computed(() =>
+  newConnection.value ? 'New Connection' : 'Edit Connection',
+);
+
+const save = async () => {
+  const channel = newConnection.value
+    ? addConnectionChannel
+    : editConnectionChannel;
+
+  await window.ipcInvoke(
+    channel,
+    ...window.serialize(persistedConnection.value),
+  );
+
+  await connectionsStore.getConnections();
+  layoutStore.closeDialog();
+};
+</script>
+
+<style scoped></style>
