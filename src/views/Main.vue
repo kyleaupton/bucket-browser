@@ -1,5 +1,5 @@
 <template>
-  <Splitter class="h-full m-2">
+  <Splitter class="h-full mx-2 mb-2">
     <SplitterPanel :size="35" :min-size="20">
       <Sidebar />
     </SplitterPanel>

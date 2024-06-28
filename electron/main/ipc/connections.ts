@@ -3,6 +3,7 @@ import {
   getConnectionsChannel,
   addConnectionChannel,
   editConnectionChannel,
+  removeConnectionChannel,
   listBucketsChannel,
 } from '@shared/ipc/connections';
 import Connection from '@main/connections/Connection';
@@ -46,6 +47,17 @@ export const registerConnectionsIpc = () => {
       if (index !== -1) {
         data.connections[index] = connection;
       }
+    });
+  });
+
+  ipcHandle(removeConnectionChannel, async (event, connectionId) => {
+    removeConnection(connectionId);
+
+    // Remove db entry
+    await db.update((data) => {
+      data.connections = data.connections.filter(
+        (conn) => conn.id !== connectionId,
+      );
     });
   });
 

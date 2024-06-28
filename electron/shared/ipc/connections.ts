@@ -17,6 +17,10 @@ export const editConnectionChannel: IpcChannel<[PersistedConnection], void> = {
   name: '/connections/edit',
 };
 
+export const removeConnectionChannel: IpcChannel<[string], void> = {
+  name: '/connections/remove',
+};
+
 export const listBucketsChannel: IpcChannel<
   [string],
   ListBucketsCommandOutput

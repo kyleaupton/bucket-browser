@@ -66,10 +66,6 @@ import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import ToggleSwitch from 'primevue/toggleswitch';
 import Button from 'primevue/button';
-import {
-  addConnectionChannel,
-  editConnectionChannel,
-} from '@shared/ipc/connections';
 import { PersistedConnection } from '@shared/types/connections';
 import { useLayoutStore, useConnectionsStore } from '@/stores';
 import { watch } from 'vue';
@@ -126,16 +122,12 @@ const title = computed(() =>
 );
 
 const save = async () => {
-  const channel = newConnection.value
-    ? addConnectionChannel
-    : editConnectionChannel;
+  if (newConnection.value) {
+    await connectionsStore.addConnection(persistedConnection.value);
+  } else {
+    await connectionsStore.editConnection(persistedConnection.value);
+  }
 
-  await window.ipcInvoke(
-    channel,
-    ...window.serialize(persistedConnection.value),
-  );
-
-  await connectionsStore.getConnections();
   layoutStore.closeDialog();
 };
 </script>
