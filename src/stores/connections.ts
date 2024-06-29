@@ -5,14 +5,11 @@ import {
   editConnectionChannel,
   removeConnectionChannel,
 } from '@shared/ipc/connections';
-import {
-  PersistedConnection,
-  SerializedConnection,
-} from '@shared/types/connections';
+import { PersistedConnection } from '@shared/types/connections';
 
 type State = {
   selectedConnection: string | undefined;
-  connections: SerializedConnection[];
+  connections: PersistedConnection[];
 };
 
 export const useConnectionsStore = defineStore('connections', {
@@ -46,7 +43,7 @@ export const useConnectionsStore = defineStore('connections', {
       await this.getConnections();
     },
 
-    async removeConnection(connection: SerializedConnection) {
+    async removeConnection(connection: PersistedConnection) {
       await window.ipcInvoke(removeConnectionChannel, connection.id);
       await this.getConnections();
     },

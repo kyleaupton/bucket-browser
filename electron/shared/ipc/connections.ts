@@ -1,11 +1,8 @@
 import { ListBucketsCommandOutput } from '@aws-sdk/client-s3';
 import { IpcChannel } from 'typed-electron-ipc';
-import {
-  PersistedConnection,
-  SerializedConnection,
-} from '@shared/types/connections';
+import { PersistedConnection } from '@shared/types/connections';
 
-export const getConnectionsChannel: IpcChannel<[], SerializedConnection[]> = {
+export const getConnectionsChannel: IpcChannel<[], PersistedConnection[]> = {
   name: '/connections/get',
 };
 

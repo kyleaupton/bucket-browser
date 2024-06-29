@@ -1,6 +1,6 @@
 <template>
   <div
-    class="sidebar-item flex items-center h-[38px] justify-between gap-2 p-2 rounded-lg cursor-pointer select-none text-sm dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800"
+    class="sidebar-item flex items-center h-[38px] justify-between gap-2 p-2 rounded-lg cursor-pointer select-none dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800"
     :class="{
       'sidebar-item-selected bg-neutral-200 dark:bg-neutral-800': selected,
     }"
@@ -26,20 +26,17 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { storeToRefs } from 'pinia';
 import Menu from 'primevue/menu';
 import { useConnectionsStore, useLayoutStore } from '@/stores';
 import { showMessageChannel } from '@shared/ipc/dialog';
-import { SerializedConnection } from '@shared/types/connections';
+import { PersistedConnection } from '@shared/types/connections';
 import { computed } from 'vue';
 
 const connectionsStore = useConnectionsStore();
-const { setDialog } = useLayoutStore();
-
-const { selectedConnection } = storeToRefs(connectionsStore);
+const layoutStore = useLayoutStore();
 
 const props = defineProps<{
-  connection: SerializedConnection;
+  connection: PersistedConnection;
 }>();
 
 const menu = ref();
@@ -51,7 +48,7 @@ const items = ref([
         label: 'Edit',
         icon: 'pi pi-pencil',
         command: () => {
-          setDialog({ name: 'connection', data: props.connection });
+          layoutStore.setDialog({ name: 'connection', data: props.connection });
         },
       },
       {
@@ -74,7 +71,7 @@ const items = ref([
 ]);
 
 const selected = computed(
-  () => selectedConnection.value === props.connection.id,
+  () => connectionsStore.selectedConnection === props.connection.id,
 );
 
 const toggle = (event: MouseEvent) => {

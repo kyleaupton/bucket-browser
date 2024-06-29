@@ -1,10 +1,11 @@
-import { S3ClientConfigType } from '@aws-sdk/client-s3';
-
 export type PersistedConnectionConfig = {
   endpoint?: string;
   region?: string;
-  credentials?: S3ClientConfigType['credentials'];
-  forcePathStyle?: S3ClientConfigType['forcePathStyle'];
+  credentials: {
+    accessKeyId: string;
+    secretAccessKey: string;
+  };
+  forcePathStyle?: boolean;
 };
 
 export type PersistedConnection = {

@@ -27,17 +27,30 @@
 
     <div class="flex items-center gap-4 mb-4">
       <label for="access-key" class="font-semibold w-24">Access Key</label>
-      <InputText id="access-key" class="flex-auto" size="small" />
+      <InputText
+        id="access-key"
+        v-model="persistedConnection.config.credentials.accessKeyId"
+        class="flex-auto"
+        size="small"
+      />
     </div>
 
     <div class="flex items-center gap-4 mb-4">
       <label for="secret-key" class="font-semibold w-24">Secret Key</label>
-      <InputText id="secret-key" class="flex-auto" size="small" />
+      <InputText
+        id="secret-key"
+        v-model="persistedConnection.config.credentials.secretAccessKey"
+        class="flex-auto"
+        size="small"
+      />
     </div>
 
     <div class="flex items-center gap-4 mb-4">
       <label for="path-style" class="font-semibold">Force Path Style</label>
-      <ToggleSwitch id="path-style" />
+      <ToggleSwitch
+        id="path-style"
+        v-model="persistedConnection.config.forcePathStyle"
+      />
     </div>
 
     <div class="flex justify-end gap-2">
@@ -98,11 +111,13 @@ const defaultConnection: PersistedConnection = {
   },
 };
 
-const persistedConnection = ref<PersistedConnection>(defaultConnection);
+let persistedConnection = ref<PersistedConnection>(defaultConnection);
 
 watch(visible, () => {
   if (dialog?.value?.data) {
-    persistedConnection.value = dialog.value.data;
+    persistedConnection = ref<PersistedConnection>(
+      ...window.serialize(dialog.value.data),
+    );
   } else {
     persistedConnection.value = defaultConnection;
   }

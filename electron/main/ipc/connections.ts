@@ -8,7 +8,6 @@ import {
 } from '@shared/ipc/connections';
 import Connection from '@main/connections/Connection';
 import {
-  getConnections,
   getConnection,
   addConnection,
   removeConnection,
@@ -17,7 +16,7 @@ import db from '@main/db';
 
 export const registerConnectionsIpc = () => {
   ipcHandle(getConnectionsChannel, async () => {
-    return getConnections();
+    return db.data.connections;
   });
 
   ipcHandle(addConnectionChannel, async (event, connection) => {
