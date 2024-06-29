@@ -13,7 +13,8 @@
   </div>
 
   <div v-else class="h-full p-2 overflow-scroll">
-    <BucketItem v-for="item of items" :key="getKeyName(item)" :item="item" />
+    <BrowserNavigation />
+    <BrowserItem v-for="item of items" :key="getKeyName(item)" :item="item" />
   </div>
 </template>
 
@@ -27,23 +28,20 @@ import {
 } from '@shared/ipc/connections';
 import { useLayoutStore } from '@/stores';
 import { getKeyName } from './utils';
-import BucketItem from './BrowserItem.vue';
+import BrowserNavigation from './BrowserNavigation.vue';
+import BrowserItem from './BrowserItem.vue';
 
 const layoutStore = useLayoutStore();
 const { path } = storeToRefs(layoutStore);
 
 const items = ref<(Bucket | _Object | CommonPrefix)[]>([]);
-// The path is a bit overloaded.
-// It looks like the following: /connection-id/bucket-name/object-name/foo/bar
 const selectedConnection = computed(() => path.value.split('/')[1]);
 const selectedBucket = computed(() => path.value.split('/')[2]);
 const selectedObject = computed(() => path.value.split('/').slice(3).join('/'));
 
 watch(path, async () => {
-  console.log(path.value);
   if (selectedConnection.value) {
     if (!selectedBucket.value) {
-      console.log('fetching bucket');
       const { Buckets } = await window.ipcInvoke(
         listBucketsChannel,
         selectedConnection.value,
@@ -51,14 +49,7 @@ watch(path, async () => {
 
       items.value = Buckets || [];
     } else {
-      console.log('fetching object');
-      console.log('Bucket', selectedBucket.value);
-      console.log(
-        'Prefix',
-        selectedObject.value ? `${selectedObject.value}/` : '',
-      );
-
-      const res = await window.ipcInvoke(
+      const { Contents, CommonPrefixes } = await window.ipcInvoke(
         listObjectsChannel,
         selectedConnection.value,
         {
@@ -68,15 +59,11 @@ watch(path, async () => {
         },
       );
 
-      console.log(res);
-
-      const _contents = res.Contents || [];
-      const _commonPrefixes = res.CommonPrefixes || [];
+      const _contents = Contents || [];
+      const _commonPrefixes = CommonPrefixes || [];
       items.value = [..._commonPrefixes, ..._contents];
     }
   }
-
-  console.log(items.value);
 });
 </script>
 

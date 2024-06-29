@@ -37,8 +37,6 @@ export const useLayoutStore = defineStore('layout', {
         window.ipcInvoke(getFolderImage),
       ]);
 
-      console.log(res);
-
       this.bucketIcon = res[0];
       this.folderIcon = res[1];
     },
