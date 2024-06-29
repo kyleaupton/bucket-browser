@@ -18,7 +18,7 @@
       </div>
       <div
         v-else-if="!items.length && !fetching"
-        class="h-full select-none flex justify-center items-center"
+        class="h-full w-full select-none flex justify-center items-center"
       >
         <div>No Items</div>
       </div>
@@ -66,7 +66,7 @@ const fetchItems = async () => {
     items.value = [];
     fetching.value = true;
 
-    // Only display spinner if fetching takes longer than 1 second
+    // Only display spinner if fetching takes longer than .5 second
     const timeout = setTimeout(() => {
       loading.value = true;
     }, 500);

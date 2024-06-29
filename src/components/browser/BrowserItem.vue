@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { useLayoutStore } from '@/stores';
-import { getKeyName, isBucket, isFolder, Item } from './utils';
+import { getKeyName, isBucket, isFolder, isObject, Item } from './utils';
 import { computed } from 'vue';
 
 const props = defineProps<{
@@ -32,11 +32,24 @@ const thumbnail = computed(() => {
     return layoutStore.folderIcon;
   } else {
     const ext = (getKeyName(props.item) || '').split('.').pop();
-    return layoutStore.fileIcons[ext || ''];
+
+    if (ext) {
+      const icon = layoutStore.fileIcons[ext];
+
+      if (icon) {
+        return icon;
+      }
+    }
+
+    return layoutStore.defaultIcon;
   }
 });
 
 const handleClick = () => {
+  if (isObject(props.item)) {
+    return;
+  }
+
   layoutStore.path = `${layoutStore.path}/${getKeyName(props.item)}`;
 };
 </script>

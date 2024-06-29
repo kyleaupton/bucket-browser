@@ -18,6 +18,7 @@ type State = {
   dialog: Dialog | undefined;
   folderIcon: string;
   bucketIcon: string;
+  defaultIcon: string;
   fileIcons: Record<string, string>;
 };
 
@@ -28,6 +29,7 @@ export const useLayoutStore = defineStore('layout', {
     dialog: undefined,
     folderIcon: '',
     bucketIcon: '',
+    defaultIcon: '',
     fileIcons: {},
   }),
 
@@ -44,10 +46,12 @@ export const useLayoutStore = defineStore('layout', {
       const res = await Promise.all([
         window.ipcInvoke(getBucketImage),
         window.ipcInvoke(getFolderImage),
+        window.ipcInvoke(getObjectImage, 'foo'),
       ]);
 
       this.bucketIcon = res[0];
       this.folderIcon = res[1];
+      this.defaultIcon = res[2];
     },
 
     async getFileIcons(contents: _Object[]) {
