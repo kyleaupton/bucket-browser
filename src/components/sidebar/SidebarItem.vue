@@ -4,9 +4,9 @@
     :class="{
       'sidebar-item-selected bg-neutral-200 dark:bg-neutral-800': selected,
     }"
-    @click.self="layoutStore.path = `/${connection.id}`"
+    @click.self="selectConnection"
   >
-    <p class="truncate" @click="layoutStore.path = `/${connection.id}`">
+    <p class="truncate" @click="selectConnection">
       {{ props.connection.nickname }}
     </p>
 
@@ -70,6 +70,11 @@ const items = ref([
 const selected = computed(
   () => connectionsStore.selectedConnection === props.connection.id,
 );
+
+const selectConnection = () => {
+  layoutStore.selectedConnection = props.connection;
+  layoutStore.path = '';
+};
 
 const toggle = (event: MouseEvent) => {
   menu.value.toggle(event);

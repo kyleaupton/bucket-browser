@@ -1,9 +1,9 @@
 <template>
-  <div class="browser-navigation flex h-13 gap-2 p-2">
+  <div class="browser-navigation flex items-center gap-2 p-2">
     <div
-      class="nav-buttons inline-flex items-center justify-center rounded-xl dark:bg-neutral-800 dark:border dark:border-neutral-500"
+      class="nav-buttons h-8 inline-flex items-center justify-center rounded-lg dark:bg-neutral-800 dark:border dark:border-neutral-500"
     >
-      <div class="nav-button-wrap rounded-l-xl">
+      <div class="nav-button-wrap rounded-l-lg">
         <div class="nav-button">
           <i class="pi pi-arrow-left" />
         </div>
@@ -11,7 +11,7 @@
 
       <div class="nav-divider" />
 
-      <div class="nav-button-wrap rounded-r-xl">
+      <div class="nav-button-wrap rounded-r-lg">
         <div class="nav-button">
           <i class="pi pi-arrow-right" />
         </div>
@@ -19,10 +19,13 @@
     </div>
 
     <Select
+      v-model="selected"
       class="w-full"
       size="small"
       :options="selectItems"
       option-label="name"
+      variant="filled"
+      checkmark
     />
   </div>
 </template>
@@ -34,12 +37,63 @@ import { useLayoutStore } from '@/stores';
 
 const layoutStore = useLayoutStore();
 
-const selectItems = computed(() =>
-  layoutStore.path
+const getItemPath = (itemName: string) => {
+  const index = layoutStore.path.split('/').indexOf(itemName);
+
+  return layoutStore.path
     .split('/')
-    .slice(1)
-    .map((item) => ({ name: item, code: item })),
-);
+    .slice(0, index + 1)
+    .join('/');
+};
+
+const selectItems = computed(() => {
+  const payload = [
+    {
+      type: 'connection',
+      name: layoutStore.selectedConnection?.nickname || '',
+      code: layoutStore.selectedConnection?.nickname || '',
+    },
+  ];
+
+  payload.push(
+    ...layoutStore.path
+      .split('/')
+      .slice(1)
+      .map((item) => ({
+        type: 'bucket/object',
+        name: item,
+        code: getItemPath(item),
+      })),
+  );
+
+  return payload;
+});
+
+const selected = computed({
+  get: () => {
+    if (!layoutStore.path) {
+      return {
+        name: layoutStore.selectedConnection?.nickname || '',
+        code: layoutStore.selectedConnection?.nickname || '',
+        type: 'connection',
+      };
+    }
+
+    const name = layoutStore.path.split('/').slice(-1)[0];
+    return {
+      name: name,
+      code: getItemPath(name),
+      type: 'bucket/object',
+    };
+  },
+  set: (item: { code: string; name: string; type: string }) => {
+    if (item.type === 'connection') {
+      layoutStore.path = '';
+    } else {
+      layoutStore.path = item.code;
+    }
+  },
+});
 </script>
 
 <style scoped>
@@ -50,7 +104,7 @@ const selectItems = computed(() =>
 }
 
 .nav-button-wrap {
-  padding: 4px 8px 2px;
+  padding: 0 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -61,7 +115,7 @@ const selectItems = computed(() =>
 </style>
 
 <style>
-.browser-navigation .p-select {
+/* .browser-navigation .p-select {
   @apply bg-neutral-800;
-}
+} */
 </style>

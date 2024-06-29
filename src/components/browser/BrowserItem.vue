@@ -44,8 +44,6 @@ if (isObject(props.item)) {
 
 const handleClick = () => {
   layoutStore.path = `${layoutStore.path}/${getKeyName(props.item)}`;
-
-  console.log('setting path to ', layoutStore.path);
 };
 </script>
 

@@ -32,26 +32,28 @@ import BrowserNavigation from './BrowserNavigation.vue';
 import BrowserItem from './BrowserItem.vue';
 
 const layoutStore = useLayoutStore();
-const { path } = storeToRefs(layoutStore);
+const { path, selectedConnection } = storeToRefs(layoutStore);
 
 const items = ref<(Bucket | _Object | CommonPrefix)[]>([]);
-const selectedConnection = computed(() => path.value.split('/')[1]);
-const selectedBucket = computed(() => path.value.split('/')[2]);
-const selectedObject = computed(() => path.value.split('/').slice(3).join('/'));
+const selectedBucket = computed(() => path.value.split('/')[1]);
+const selectedObject = computed(() => path.value.split('/').slice(2).join('/'));
 
-watch(path, async () => {
+watch(selectedConnection, () => fetchItems());
+watch(path, () => fetchItems());
+
+const fetchItems = async () => {
   if (selectedConnection.value) {
     if (!selectedBucket.value) {
       const { Buckets } = await window.ipcInvoke(
         listBucketsChannel,
-        selectedConnection.value,
+        selectedConnection.value.id,
       );
 
       items.value = Buckets || [];
     } else {
       const { Contents, CommonPrefixes } = await window.ipcInvoke(
         listObjectsChannel,
-        selectedConnection.value,
+        selectedConnection.value.id,
         {
           Bucket: selectedBucket.value,
           Prefix: selectedObject.value ? `${selectedObject.value}/` : '',
@@ -64,7 +66,7 @@ watch(path, async () => {
       items.value = [..._commonPrefixes, ..._contents];
     }
   }
-});
+};
 </script>
 
 <style scoped></style>

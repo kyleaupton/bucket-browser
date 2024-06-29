@@ -8,6 +8,7 @@ type Dialog = {
 };
 
 type State = {
+  selectedConnection: PersistedConnection | undefined;
   path: string;
   dialog: Dialog | undefined;
   folderIcon: string;
@@ -16,6 +17,7 @@ type State = {
 
 export const useLayoutStore = defineStore('layout', {
   state: (): State => ({
+    selectedConnection: undefined,
     path: '',
     dialog: undefined,
     folderIcon: '',
