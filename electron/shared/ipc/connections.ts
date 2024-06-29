@@ -1,4 +1,8 @@
-import { ListBucketsCommandOutput } from '@aws-sdk/client-s3';
+import {
+  ListBucketsCommandOutput,
+  ListObjectsCommandInput,
+  ListObjectsCommandOutput,
+} from '@aws-sdk/client-s3';
 import { IpcChannel } from 'typed-electron-ipc';
 import { PersistedConnection } from '@shared/types/connections';
 
@@ -23,4 +27,11 @@ export const listBucketsChannel: IpcChannel<
   ListBucketsCommandOutput
 > = {
   name: '/connections/list-buckets',
+};
+
+export const listObjectsChannel: IpcChannel<
+  [string, ListObjectsCommandInput],
+  ListObjectsCommandOutput
+> = {
+  name: '/connections/list-objects',
 };

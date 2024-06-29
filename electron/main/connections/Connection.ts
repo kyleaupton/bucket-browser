@@ -1,4 +1,9 @@
-import { S3Client, ListBucketsCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  ListBucketsCommand,
+  ListObjectsCommand,
+  ListObjectsCommandInput,
+} from '@aws-sdk/client-s3';
 import {
   SerializedConnection,
   PersistedConnection,
@@ -26,7 +31,9 @@ export default class Connection {
     return this.client.send(new ListBucketsCommand());
   }
 
-  listObjects() {}
+  listObjects(input: ListObjectsCommandInput) {
+    return this.client.send(new ListObjectsCommand(input));
+  }
 
   serialize(): SerializedConnection {
     return {

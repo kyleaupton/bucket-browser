@@ -5,6 +5,7 @@ import {
   editConnectionChannel,
   removeConnectionChannel,
   listBucketsChannel,
+  listObjectsChannel,
 } from '@shared/ipc/connections';
 import Connection from '@main/connections/Connection';
 import {
@@ -67,5 +68,14 @@ export const registerConnectionsIpc = () => {
     }
 
     return connection.listBuckets();
+  });
+
+  ipcHandle(listObjectsChannel, async (event, connectionId, input) => {
+    const connection = getConnection(connectionId);
+    if (!connection) {
+      return throwIpcError('Connection not found');
+    }
+
+    return connection.listObjects(input);
   });
 };

@@ -1,15 +1,12 @@
 <template>
   <div
-    class="sidebar-item flex items-center h-[38px] justify-between gap-2 p-2 rounded-lg cursor-pointer select-none dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800"
+    class="sidebar-item flex items-center justify-between gap-2 p-2 rounded-lg cursor-pointer select-none dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800"
     :class="{
       'sidebar-item-selected bg-neutral-200 dark:bg-neutral-800': selected,
     }"
-    @click.self="connectionsStore.selectConnection(props.connection.id)"
+    @click.self="layoutStore.path = `/${connection.id}`"
   >
-    <p
-      class="truncate"
-      @click="connectionsStore.selectConnection(props.connection.id)"
-    >
+    <p class="truncate" @click="layoutStore.path = `/${connection.id}`">
       {{ props.connection.nickname }}
     </p>
 

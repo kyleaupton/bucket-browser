@@ -1,5 +1,5 @@
 <template>
-  <div class="titlebar-drag h-12"></div>
+  <div class="titlebar-drag h-12 shrink-0"></div>
 </template>
 
 <script setup lang="ts"></script>
