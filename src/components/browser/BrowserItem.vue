@@ -1,12 +1,12 @@
 <template>
-  <div class="px-4">
+  <div class="px-4 overflow-hidden">
     <div
-      class="flex items-center justify-between h-[48px] gap-2 p-2 rounded-lg cursor-pointer select-none dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800"
+      class="flex overflow-hidden items-center justify-between h-[48px] gap-2 p-2 rounded-lg cursor-pointer select-none dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800"
       @click="handleClick"
     >
-      <div class="flex gap-2 items-center">
+      <div class="flex gap-2 items-center overflow-hidden">
         <img class="h-[32px] w-[32px]" :src="thumbnail" />
-        <div>{{ getKeyName(item) }}</div>
+        <div class="truncate">{{ getKeyName(item) }}</div>
       </div>
 
       <!-- <i class="pi pi-ellipsis-h"></i> -->

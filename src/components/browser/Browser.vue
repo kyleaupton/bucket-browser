@@ -8,7 +8,7 @@
 
   <div v-else class="flex flex-col h-full">
     <BrowserNavigation />
-    <div class="flex-grow overflow-hidden mb-2">
+    <div class="flex flex-grow mb-2 overflow-hidden">
       <div v-if="loading" class="h-full flex justify-center items-center">
         <ProgressSpinner
           style="width: 50px; height: 50px"
@@ -22,11 +22,16 @@
       >
         <div>No Items</div>
       </div>
-      <VirtualScroller v-else class="h-full" :items="items" :item-size="48">
-        <template #item="{ item }">
-          <BrowserItem :item="item" />
-        </template>
-      </VirtualScroller>
+      <RecycleScroller
+        v-else
+        v-slot="{ item }"
+        class="h-full w-full"
+        :items="items"
+        :item-size="48"
+        key-field=""
+      >
+        <BrowserItem :item="item" />
+      </RecycleScroller>
     </div>
   </div>
 </template>
@@ -34,7 +39,6 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import VirtualScroller from 'primevue/virtualscroller';
 import ProgressSpinner from 'primevue/progressspinner';
 import { Bucket, _Object, CommonPrefix } from '@aws-sdk/client-s3';
 import {
@@ -99,14 +103,13 @@ const fetchItems = async () => {
 };
 </script>
 
-<style scoped>
-.v-enter-active,
-.v-leave-active {
-  transition: opacity 0.1s ease;
+<style>
+.p-virtualscroller {
+  height: 100% !important;
+  width: 100% !important;
 }
 
-.v-enter-from,
-.v-leave-to {
-  opacity: 0;
+.p-virtualscroller .p-virtualscroller-content {
+  width: 100%;
 }
 </style>
