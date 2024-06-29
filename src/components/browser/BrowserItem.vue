@@ -9,16 +9,14 @@
         <div>{{ getKeyName(item) }}</div>
       </div>
 
-      <i class="pi pi-ellipsis-h"></i>
+      <!-- <i class="pi pi-ellipsis-h"></i> -->
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import { useLayoutStore } from '@/stores';
-import { getObjectImage } from '@shared/ipc/app';
-import { getKeyName, isObject, isBucket, isFolder, Item } from './utils';
+import { getKeyName, isBucket, isFolder, Item } from './utils';
 import { computed } from 'vue';
 
 const props = defineProps<{
@@ -27,22 +25,16 @@ const props = defineProps<{
 
 const layoutStore = useLayoutStore();
 
-const objThumbnail = ref<string | undefined>(undefined);
 const thumbnail = computed(() => {
   if (isBucket(props.item)) {
     return layoutStore.bucketIcon;
   } else if (isFolder(props.item)) {
     return layoutStore.folderIcon;
   } else {
-    return objThumbnail.value;
+    const ext = (getKeyName(props.item) || '').split('.').pop();
+    return layoutStore.fileIcons[ext || ''];
   }
 });
-
-if (isObject(props.item)) {
-  window
-    .ipcInvoke(getObjectImage, getKeyName(props.item))
-    .then((data) => (objThumbnail.value = data));
-}
 
 const handleClick = () => {
   layoutStore.path = `${layoutStore.path}/${getKeyName(props.item)}`;

@@ -15,13 +15,11 @@
   <div v-else class="flex flex-col h-full">
     <BrowserNavigation />
     <div class="flex-grow overflow-hidden mb-2">
-      <ScrollPanel class="h-full">
-        <BrowserItem
-          v-for="item of items"
-          :key="getKeyName(item)"
-          :item="item"
-        />
-      </ScrollPanel>
+      <VirtualScroller class="h-full" :items="items" :item-size="48">
+        <template #item="{ item }">
+          <BrowserItem :item="item" />
+        </template>
+      </VirtualScroller>
     </div>
   </div>
 </template>
@@ -29,14 +27,13 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import ScrollPanel from 'primevue/scrollpanel';
+import VirtualScroller from 'primevue/virtualscroller';
 import { Bucket, _Object, CommonPrefix } from '@aws-sdk/client-s3';
 import {
   listBucketsChannel,
   listObjectsChannel,
 } from '@shared/ipc/connections';
 import { useLayoutStore } from '@/stores';
-import { getKeyName } from './utils';
 import BrowserNavigation from './BrowserNavigation.vue';
 import BrowserItem from './BrowserItem.vue';
 
@@ -72,6 +69,9 @@ const fetchItems = async () => {
 
       const _contents = Contents || [];
       const _commonPrefixes = CommonPrefixes || [];
+
+      await layoutStore.getFileIcons(_contents);
+
       items.value = [..._commonPrefixes, ..._contents];
     }
   }
