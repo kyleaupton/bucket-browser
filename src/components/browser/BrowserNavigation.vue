@@ -1,22 +1,11 @@
 <template>
-  <div class="browser-navigation flex items-center gap-2 p-2">
-    <div
-      class="nav-buttons h-8 inline-flex items-center justify-center rounded-lg dark:bg-neutral-800 dark:border dark:border-neutral-500"
-    >
-      <div class="nav-button-wrap rounded-l-lg">
-        <div class="nav-button">
-          <i class="pi pi-arrow-left" />
-        </div>
-      </div>
-
-      <div class="nav-divider" />
-
-      <div class="nav-button-wrap rounded-r-lg">
-        <div class="nav-button">
-          <i class="pi pi-arrow-right" />
-        </div>
-      </div>
-    </div>
+  <div class="browser-navigation flex items-center gap-2 px-4 py-2">
+    <Button
+      icon="pi pi-arrow-left"
+      severity="secondary"
+      size="small"
+      @click="goBack"
+    />
 
     <Select
       v-model="selected"
@@ -32,6 +21,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import Button from 'primevue/button';
 import Select from 'primevue/select';
 import { useLayoutStore } from '@/stores';
 
@@ -94,6 +84,12 @@ const selected = computed({
     }
   },
 });
+
+const goBack = () => {
+  const path = layoutStore.path.split('/');
+  path.pop();
+  layoutStore.path = path.join('/');
+};
 </script>
 
 <style scoped>

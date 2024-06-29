@@ -12,15 +12,24 @@
     <div>No Items</div>
   </div>
 
-  <div v-else class="h-full p-2 overflow-scroll">
+  <div v-else class="flex flex-col h-full">
     <BrowserNavigation />
-    <BrowserItem v-for="item of items" :key="getKeyName(item)" :item="item" />
+    <div class="flex-grow overflow-hidden mb-2">
+      <ScrollPanel class="h-full">
+        <BrowserItem
+          v-for="item of items"
+          :key="getKeyName(item)"
+          :item="item"
+        />
+      </ScrollPanel>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
 import { storeToRefs } from 'pinia';
+import ScrollPanel from 'primevue/scrollpanel';
 import { Bucket, _Object, CommonPrefix } from '@aws-sdk/client-s3';
 import {
   listBucketsChannel,

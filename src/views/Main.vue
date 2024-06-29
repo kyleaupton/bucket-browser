@@ -20,6 +20,6 @@ import Browser from '@/components/browser/Browser.vue';
 <style scoped>
 .main {
   height: 100%;
-  max-height: calc(100vh - 3rem - 0.5rem);
+  max-height: calc(100dvh - 3rem - 0.5rem);
 }
 </style>
