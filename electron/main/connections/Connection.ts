@@ -18,6 +18,8 @@ export default class Connection {
   nickname: string;
   config: PersistedConnectionConfig;
   client: S3Client;
+  // currentTransferId: string | undefined;
+  // transfers: any[] = [];
 
   constructor(connection: PersistedConnection) {
     this.id = connection.id;
@@ -27,11 +29,11 @@ export default class Connection {
     this.client = new S3Client(this.config);
   }
 
-  listBuckets() {
+  async listBuckets() {
     return this.client.send(new ListBucketsCommand());
   }
 
-  listObjects(input: ListObjectsCommandInput) {
+  async listObjects(input: ListObjectsCommandInput) {
     return this.client.send(new ListObjectsCommand(input));
   }
 
