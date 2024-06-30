@@ -32,7 +32,7 @@ A desktop app to browse S3 buckets
   - [ ] Create `TransferDownload`
   - [ ] Figure out how to send status updates to the UI
   - [ ] Create UI for transfers
-  - [ ] Impliment pause, resume, cancel5
+  - [ ] Impliment pause, resume, cancel
   - [ ] Add logic for read/write vs. just read
 - [ ] UI
   - [ ] Finish light mode colors
