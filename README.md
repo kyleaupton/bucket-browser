@@ -2,6 +2,9 @@
 
 A desktop app to browse S3 buckets
 
+> [!NOTE]
+> This is still under active development. Check back soon for a v1 release!
+
 ## Todo
 
 - [ ] Finish `README`
