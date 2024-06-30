@@ -18,8 +18,6 @@ export default class Connection {
   nickname: string;
   config: PersistedConnectionConfig;
   client: S3Client;
-  // currentTransferId: string | undefined;
-  // transfers: any[] = [];
 
   constructor(connection: PersistedConnection) {
     this.id = connection.id;
@@ -37,6 +35,7 @@ export default class Connection {
     return this.client.send(new ListObjectsCommand(input));
   }
 
+  // Not being used rn
   serialize(): SerializedConnection {
     return {
       id: this.id,

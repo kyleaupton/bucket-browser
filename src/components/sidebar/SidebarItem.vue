@@ -22,12 +22,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import Menu from 'primevue/menu';
 import { useConnectionsStore, useLayoutStore } from '@/stores';
 import { showMessageChannel } from '@shared/ipc/dialog';
 import { PersistedConnection } from '@shared/types/connections';
-import { computed } from 'vue';
 
 const connectionsStore = useConnectionsStore();
 const layoutStore = useLayoutStore();
@@ -68,7 +67,7 @@ const items = ref([
 ]);
 
 const selected = computed(
-  () => connectionsStore.selectedConnection === props.connection.id,
+  () => layoutStore.selectedConnection?.id === props.connection.id,
 );
 
 const selectConnection = () => {

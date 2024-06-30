@@ -92,8 +92,6 @@ const fetchItems = async () => {
       const _contents = Contents || [];
       const _commonPrefixes = CommonPrefixes || [];
 
-      console.log(_contents);
-
       await layoutStore.getFileIcons(_contents);
 
       items.value = [..._commonPrefixes, ..._contents];
