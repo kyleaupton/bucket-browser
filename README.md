@@ -26,6 +26,14 @@ A desktop app to browse S3 buckets
       - [ ] Linux...? (Maybe no linux build for v1)
   - [x] Browder navigation controls
   - [ ] Clean up UI
+- [ ] Transfers
+  - [ ] Create transfer infrastructure
+  - [ ] Create `TransferUpload`
+  - [ ] Create `TransferDownload`
+  - [ ] Figure out how to send status updates to the UI
+  - [ ] Create UI for transfers
+  - [ ] Impliment pause, resume, cancel5
+  - [ ] Add logic for read/write vs. just read
 - [ ] UI
   - [ ] Finish light mode colors
   - [ ] Create surface css vars for consistant background colors
