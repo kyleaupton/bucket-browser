@@ -7,10 +7,12 @@ import {
 } from '@shared/ipc/app';
 import { PersistedConnection } from '@shared/types/connections';
 
-type Dialog = {
+export type DialogConnection = {
   name: 'connection';
   data?: PersistedConnection;
 };
+export type DialogTransfers = { name: 'transfers' };
+export type Dialog = DialogConnection | DialogTransfers;
 
 type State = {
   selectedConnection: PersistedConnection | undefined;

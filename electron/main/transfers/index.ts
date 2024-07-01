@@ -5,7 +5,7 @@ type Transfer = TransferDownload | TransferUpload;
 const transfers = new Map<string, Transfer>();
 
 export const getTransfers = () => {
-  return Array.from(transfers.values()).map((transfer) => transfer.serialize());
+  return transfers;
 };
 
 export const getTransfer = (id: string) => {
@@ -27,6 +27,16 @@ export const pauseTransfer = (id: string) => {
   nextTransfer();
 };
 
+export const resumeTransfer = (id: string) => {
+  const transfer = getTransfer(id);
+  if (!transfer) {
+    return;
+  }
+
+  transfer.resume();
+  nextTransfer();
+};
+
 export const cancelTransfer = (id: string) => {
   const transfer = getTransfer(id);
   if (!transfer) {
@@ -34,6 +44,11 @@ export const cancelTransfer = (id: string) => {
   }
 
   transfer.cancel();
+  transfers.delete(id);
+  nextTransfer();
+};
+
+export const removeTransfer = (id: string) => {
   transfers.delete(id);
   nextTransfer();
 };

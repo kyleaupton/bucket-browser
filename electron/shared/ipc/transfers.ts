@@ -5,7 +5,10 @@ import {
   TransferInputUpload,
 } from '@shared/types/transfers';
 
-export const getTransfersChannel: IpcChannel<[], SerializedTransfer[]> = {
+export const getTransfersChannel: IpcChannel<
+  [],
+  Record<string, SerializedTransfer>
+> = {
   name: '/transfers/get',
 };
 

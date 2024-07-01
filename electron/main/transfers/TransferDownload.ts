@@ -1,11 +1,17 @@
 import fs from 'fs';
 import { promisify } from 'util';
 import stream from 'stream';
+import { BrowserWindow } from 'electron';
 import { GetObjectCommand, GetObjectCommandInput } from '@aws-sdk/client-s3';
 import { nanoid } from 'nanoid';
-import { TransferInputDownload, TransferStatus } from '@shared/types/transfers';
+import {
+  TransferInputDownload,
+  TransferStatus,
+  SerializedTransfer,
+} from '@shared/types/transfers';
 import Connection from '@main/connections/Connection';
 import { getConnection } from '@main/connections';
+import { removeTransfer } from '.';
 import Transfer from './Transfer';
 
 const pipeline = promisify(stream.pipeline);
@@ -40,10 +46,14 @@ export default class TransferDownload implements Transfer {
     }
 
     this.connection = connection;
+
+    this.sendUpdate = this.sendUpdate.bind(this);
+    this.removeTransfer = this.removeTransfer.bind(this);
   }
 
   private async initialize() {
     this.status = 'initializing';
+    this.sendUpdate();
 
     const response = await this.connection.client.send(
       new GetObjectCommand(this.clientOptions),
@@ -70,10 +80,10 @@ export default class TransferDownload implements Transfer {
           return callback();
         }
 
+        this.status = 'running';
         this.downloadedBytes += chunk.length;
-        console.log(
-          `Progress: ${((this.downloadedBytes / this.totalBytes) * 100).toFixed(2)}%`,
-        );
+
+        this.sendUpdate();
         callback(null, chunk);
       },
     });
@@ -81,9 +91,7 @@ export default class TransferDownload implements Transfer {
     pipeline(this.downloadStream!, progressStream, this.writeStream)
       .then(() => {
         if (!this.isCanceled) {
-          console.log(
-            `Downloaded ${this.clientOptions.Key} to ${this.downloadPath}`,
-          );
+          this.removeTransfer();
         }
       })
       .catch((err) => {
@@ -100,10 +108,12 @@ export default class TransferDownload implements Transfer {
     this.isCanceled = true;
     this.downloadStream!.destroy();
     this.writeStream.close();
+    this.sendUpdate();
   }
 
   pause() {
     this.isPaused = true;
+    this.sendUpdate();
   }
 
   resume() {
@@ -112,13 +122,35 @@ export default class TransferDownload implements Transfer {
       this.downloadStream!.resume();
       this.pipeStreams();
     }
+
+    this.sendUpdate();
   }
 
-  serialize() {
+  sendUpdate() {
+    BrowserWindow.getAllWindows().forEach((window) =>
+      window.webContents.send('/transfers/update', this.serialize()),
+    );
+  }
+
+  removeTransfer() {
+    removeTransfer(this.id);
+    BrowserWindow.getAllWindows().forEach((window) =>
+      window.webContents.send('/transfers/remove', this.id),
+    );
+  }
+
+  serialize(): SerializedTransfer {
     return {
       id: this.id,
+      name: this.clientOptions.Key || 'Unknown Name',
       type: 'download' as const,
       status: this.status,
+      progress: {
+        currentBytes: this.downloadedBytes,
+        totalBytes: this.totalBytes,
+        percentage: (this.downloadedBytes / this.totalBytes) * 100,
+        eta: '0s',
+      },
     };
   }
 }

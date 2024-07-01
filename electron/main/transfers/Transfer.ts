@@ -7,5 +7,6 @@ export default interface Transfer {
   cancel(): void;
   pause(): void;
   resume(): void;
+  sendUpdate(): void;
   serialize(): SerializedTransfer;
 }

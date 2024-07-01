@@ -10,7 +10,6 @@ export type TransferStatus =
   | 'initializing'
   | 'running'
   | 'paused'
-  | 'completed'
   | 'failed';
 
 interface TransferInputBase {
@@ -29,8 +28,15 @@ export interface TransferInputDownload extends TransferInputBase {
 
 export type SerializedTransfer = {
   id: string;
+  name: string;
   type: TransferType;
   status: TransferStatus;
+  progress: {
+    currentBytes: number;
+    totalBytes: number;
+    percentage: number;
+    eta: string;
+  };
 };
 
 export const isTransferInputUpload = (

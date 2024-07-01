@@ -57,6 +57,8 @@ const items = ref([
                 Key: props.item.Key,
               },
             });
+
+            layoutStore.setDialog({ name: 'transfers' });
           }
         },
       },

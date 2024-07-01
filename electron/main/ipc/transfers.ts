@@ -10,7 +10,14 @@ import { getTransfersChannel, addTransferChannel } from '@shared/ipc/transfers';
 
 export const registerTransfersIpc = () => {
   ipcHandle(getTransfersChannel, async () => {
-    return getTransfers();
+    const transfers = getTransfers();
+
+    return Object.fromEntries(
+      Array.from(transfers.values()).map((transfer) => [
+        transfer.id,
+        transfer.serialize(),
+      ]),
+    );
   });
 
   ipcHandle(addTransferChannel, async (event, input) => {

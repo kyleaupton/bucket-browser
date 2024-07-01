@@ -72,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { nanoid } from 'nanoid';
 import Dialog from 'primevue/dialog';
@@ -80,22 +80,36 @@ import InputText from 'primevue/inputtext';
 import ToggleSwitch from 'primevue/toggleswitch';
 import Button from 'primevue/button';
 import { PersistedConnection } from '@shared/types/connections';
-import { useLayoutStore, useConnectionsStore } from '@/stores';
-import { watch } from 'vue';
+import {
+  useLayoutStore,
+  useConnectionsStore,
+  Dialog as t_Dialog,
+  DialogConnection,
+} from '@/stores';
 
 const layoutStore = useLayoutStore();
 const connectionsStore = useConnectionsStore();
 const { dialog } = storeToRefs(layoutStore);
 
-const visible = computed({
+const isConnectionDialog = (dialog: t_Dialog): dialog is DialogConnection => {
+  return dialog?.name === 'connection';
+};
+
+const visible = computed<boolean>({
   get: () => {
-    return dialog?.value?.name === 'connection';
+    return dialog.value !== undefined && isConnectionDialog(dialog.value);
   },
   set: (val: boolean) => {
     if (val === false) {
       layoutStore.closeDialog();
     }
   },
+});
+
+const _dialog = computed(() => {
+  return (visible.value ? dialog.value : undefined) as
+    | DialogConnection
+    | undefined;
 });
 
 const defaultConnection: PersistedConnection = {
@@ -114,16 +128,16 @@ const defaultConnection: PersistedConnection = {
 let persistedConnection = ref<PersistedConnection>(defaultConnection);
 
 watch(visible, () => {
-  if (dialog?.value?.data) {
+  if (_dialog?.value?.data) {
     persistedConnection = ref<PersistedConnection>(
-      ...window.serialize(dialog.value.data),
+      ...window.serialize(_dialog.value.data),
     );
   } else {
     persistedConnection.value = defaultConnection;
   }
 });
 
-const newConnection = computed(() => dialog?.value?.data === undefined);
+const newConnection = computed(() => _dialog?.value?.data === undefined);
 
 const disabled = computed(() => {
   return (

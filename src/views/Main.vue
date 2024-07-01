@@ -1,5 +1,5 @@
 <template>
-  <Splitter class="main mx-2 mb-2">
+  <Splitter class="main">
     <SplitterPanel :size="35" :min-size="20">
       <Sidebar />
     </SplitterPanel>
@@ -20,6 +20,6 @@ import Browser from '@/components/browser/Browser.vue';
 <style scoped>
 .main {
   height: 100%;
-  max-height: calc(100dvh - 3rem - 0.5rem);
+  max-height: calc(100dvh - 0.5rem);
 }
 </style>

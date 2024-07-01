@@ -7,12 +7,26 @@ import {
 } from '@shared/types/transfers';
 
 type State = {
-  transfers: SerializedTransfer[];
+  transfers: Record<string, SerializedTransfer>;
 };
 
 export const useTransfersStore = defineStore('transfers', {
   state: (): State => ({
-    transfers: [],
+    // transfers: {
+    //   UPEAiAilPsZXkFIBSG94_: {
+    //     id: 'UPEAiAilPsZXkFIBSG94_',
+    //     name: 'example.txt',
+    //     type: 'download',
+    //     status: 'initializing',
+    //     progress: {
+    //       currentBytes: 905468082,
+    //       totalBytes: 1270805003,
+    //       percentage: 71.25153582669678,
+    //       eta: '0s',
+    //     },
+    //   },
+    // },
+    transfers: {},
   }),
 
   actions: {
@@ -22,7 +36,21 @@ export const useTransfersStore = defineStore('transfers', {
 
     async addTransfer(input: TransferInputUpload | TransferInputDownload) {
       await window.ipcInvoke(addTransferChannel, input);
-      await this.getTransfers();
+    },
+
+    updateTransfer(transfer: SerializedTransfer) {
+      this.transfers[transfer.id] = transfer;
+    },
+
+    registerTransferEvents() {
+      window.onTransferUpdate((transfer) => {
+        console.log(transfer);
+        this.updateTransfer(transfer);
+      });
+
+      window.onTransferRemove((id) => {
+        delete this.transfers[id];
+      });
     },
   },
 });
