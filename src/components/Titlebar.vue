@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="titlebar-drag relative h-12 shrink-0 flex justify-between p-2"
-    :class="{ 'titlebar-macos': macosTitlebar }"
-  >
+  <div class="titlebar-drag relative h-12 shrink-0 flex justify-between p-2">
     <div
       class="absolute flex gap-2 box-border h-12 p-2 -m-2"
       :class="{ 'left-[74px]': macosTitlebar }"
@@ -45,7 +42,7 @@
     <div class="absolute flex right-2 h-12 p-2 -m-2">
       <Button
         class="titlebar-nodrag"
-        icon="pi pi-sync"
+        icon="pi pi-arrow-right-arrow-left"
         severity="secondary"
         size="small"
         @click="showTransfers"
@@ -139,13 +136,5 @@ const showNewConnection = () => layoutStore.setDialog({ name: 'connection' });
 
 .titlebar-nodrag {
   -webkit-app-region: no-drag;
-}
-
-.titlebar-macos {
-  /* padding-left: 74px; */
-}
-
-.titlebar-macos .titlebar-center {
-  /* margin-left: -74px; */
 }
 </style>

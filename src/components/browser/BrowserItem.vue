@@ -4,9 +4,9 @@
       class="flex overflow-hidden items-center justify-between h-[48px] gap-2 p-2 rounded-lg cursor-pointer select-none dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800"
       @click.self="handleClick"
     >
-      <div class="flex gap-2 items-center overflow-hidden">
+      <div class="flex gap-2 items-center overflow-hidden" @click="handleClick">
         <img class="h-[32px] w-[32px]" :src="thumbnail" />
-        <div class="truncate" @click="handleClick">{{ getKeyName(item) }}</div>
+        <div class="truncate">{{ getKeyName(item) }}</div>
       </div>
 
       <div

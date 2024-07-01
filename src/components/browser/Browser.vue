@@ -6,8 +6,8 @@
     <div>No Connection Selected</div>
   </div>
 
-  <div v-else class="flex flex-col h-full">
-    <div class="flex flex-grow mb-2 overflow-hidden">
+  <div v-else class="flex flex-col h-full py-2">
+    <div class="flex flex-grow overflow-hidden">
       <div v-if="loading" class="h-full flex justify-center items-center">
         <ProgressSpinner
           style="width: 50px; height: 50px"
