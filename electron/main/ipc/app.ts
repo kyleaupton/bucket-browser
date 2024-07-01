@@ -4,6 +4,7 @@ import {
   getObjectImage,
   getFolderImage,
   getBucketImage,
+  getOsChannel,
 } from '@shared/ipc/app';
 
 export const registerAppIpc = () => {
@@ -25,5 +26,9 @@ export const registerAppIpc = () => {
         { height: 32, width: 32 },
       )
     ).toDataURL();
+  });
+
+  ipcHandle(getOsChannel, () => {
+    return process.platform;
   });
 };

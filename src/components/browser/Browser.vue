@@ -7,7 +7,6 @@
   </div>
 
   <div v-else class="flex flex-col h-full">
-    <BrowserNavigation />
     <div class="flex flex-grow mb-2 overflow-hidden">
       <div v-if="loading" class="h-full flex justify-center items-center">
         <ProgressSpinner
@@ -46,7 +45,6 @@ import {
   listObjectsChannel,
 } from '@shared/ipc/connections';
 import { useLayoutStore } from '@/stores';
-import BrowserNavigation from './BrowserNavigation.vue';
 import BrowserItem from './BrowserItem.vue';
 
 const layoutStore = useLayoutStore();

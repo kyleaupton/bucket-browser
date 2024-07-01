@@ -21,6 +21,7 @@ const transfersStore = useTransfersStore();
 
 connectionsStore.getConnections();
 layoutStore.getIcons();
+layoutStore.getOs();
 transfersStore.registerTransferEvents();
 
 window.serialize = serialize;

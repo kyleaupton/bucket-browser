@@ -11,3 +11,8 @@ export const getFolderImage: IpcChannel<[], string> = {
 export const getBucketImage: IpcChannel<[], string> = {
   name: '/app/bucket-image',
 };
+
+// eslint-disable-next-line
+export const getOsChannel: IpcChannel<[], NodeJS.Platform> = {
+  name: '/app/os',
+};

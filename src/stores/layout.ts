@@ -4,6 +4,7 @@ import {
   getBucketImage,
   getFolderImage,
   getObjectImage,
+  getOsChannel,
 } from '@shared/ipc/app';
 import { PersistedConnection } from '@shared/types/connections';
 
@@ -15,6 +16,8 @@ export type DialogTransfers = { name: 'transfers' };
 export type Dialog = DialogConnection | DialogTransfers;
 
 type State = {
+  // eslint-disable-next-line
+  os: NodeJS.Platform | undefined;
   selectedConnection: PersistedConnection | undefined;
   path: string;
   dialog: Dialog | undefined;
@@ -26,6 +29,7 @@ type State = {
 
 export const useLayoutStore = defineStore('layout', {
   state: (): State => ({
+    os: undefined,
     selectedConnection: undefined,
     path: '',
     dialog: undefined,
@@ -36,6 +40,10 @@ export const useLayoutStore = defineStore('layout', {
   }),
 
   actions: {
+    async getOs() {
+      this.os = await window.ipcInvoke(getOsChannel);
+    },
+
     setDialog(dialog: Dialog) {
       this.dialog = dialog;
     },
