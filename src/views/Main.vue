@@ -1,7 +1,18 @@
 <template>
   <div class="main border-t dark:border-neutral-600">
-    <SplitterGroup id="splitter-group-1" direction="horizontal">
-      <SplitterPanel id="splitter-panel-1" :size="35" :min-size="20">
+    <SplitterGroup
+      id="splitter-group-1"
+      direction="horizontal"
+      auto-save-id="sidebar"
+    >
+      <SplitterPanel
+        id="splitter-panel-1"
+        ref="sidebar"
+        :size="35"
+        :min-size="20"
+        :collapsed-size="0"
+        collapsible
+      >
         <Sidebar />
       </SplitterPanel>
       <SplitterResizeHandle
@@ -16,10 +27,21 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import { SplitterGroup, SplitterPanel, SplitterResizeHandle } from 'radix-vue';
-
 import Sidebar from '@/components/sidebar/Sidebar.vue';
 import Browser from '@/components/browser/Browser.vue';
+import { emitter } from '@/emitter';
+
+const sidebar = ref<InstanceType<typeof SplitterPanel>>();
+
+const toggleSidebar = () => {
+  sidebar.value?.isCollapsed
+    ? sidebar.value?.expand()
+    : sidebar.value?.collapse();
+};
+
+emitter.on('toggle-sidebar', toggleSidebar);
 </script>
 
 <style scoped>

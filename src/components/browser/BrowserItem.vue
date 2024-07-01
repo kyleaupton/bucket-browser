@@ -1,5 +1,5 @@
 <template>
-  <div class="browser-item px-4 overflow-hidden">
+  <div class="browser-item px-2 overflow-hidden">
     <div
       class="flex overflow-hidden items-center justify-between h-[48px] gap-2 p-2 rounded-lg cursor-pointer select-none dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800"
       @click.self="handleClick"

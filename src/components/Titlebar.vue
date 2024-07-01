@@ -9,6 +9,7 @@
         icon="pi pi-bars"
         severity="secondary"
         size="small"
+        @click="toggleSidebar"
       />
       <Button
         class="titlebar-nodrag"
@@ -30,7 +31,7 @@
 
       <Select
         v-model="selected"
-        class="titlebar-nodrag w-full"
+        class="titlebar-nodrag titlebar-select w-full"
         size="small"
         :options="selectItems"
         option-label="name"
@@ -56,6 +57,7 @@ import { computed } from 'vue';
 import Button from 'primevue/button';
 import Select from 'primevue/select';
 import { useLayoutStore } from '@/stores';
+import { emitter } from '@/emitter';
 
 const layoutStore = useLayoutStore();
 
@@ -127,6 +129,7 @@ const goBack = () => {
 
 const showTransfers = () => layoutStore.setDialog({ name: 'transfers' });
 const showNewConnection = () => layoutStore.setDialog({ name: 'connection' });
+const toggleSidebar = () => emitter.emit('toggle-sidebar');
 </script>
 
 <style scoped>
@@ -136,5 +139,14 @@ const showNewConnection = () => layoutStore.setDialog({ name: 'connection' });
 
 .titlebar-nodrag {
   -webkit-app-region: no-drag;
+}
+</style>
+
+<style>
+.titlebar-select .p-select-label {
+  padding: 0;
+  display: flex;
+  align-items: center;
+  @apply px-3;
 }
 </style>
