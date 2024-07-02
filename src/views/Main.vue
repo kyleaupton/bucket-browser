@@ -1,5 +1,5 @@
 <template>
-  <div class="main border-t dark:border-neutral-600">
+  <div class="main border-t dark:border-neutral-700">
     <SplitterGroup
       id="splitter-group-1"
       direction="horizontal"
@@ -17,7 +17,8 @@
       </SplitterPanel>
       <SplitterResizeHandle
         id="splitter-resize-handle-1"
-        class="w-[1px] dark:bg-neutral-600"
+        class="w-[1px] dark:bg-neutral-700"
+        :class="{ 'bg-transparent dark:bg-transparent': sidebar?.isCollapsed }"
       />
       <SplitterPanel id="splitter-panel-2" :size="65" :min-size="65">
         <Browser />

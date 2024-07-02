@@ -8,7 +8,10 @@
 
   <div v-else class="flex flex-col h-full py-2">
     <div class="flex flex-grow overflow-hidden">
-      <div v-if="loading" class="h-full flex justify-center items-center">
+      <div
+        v-if="loading"
+        class="h-full w-full flex justify-center items-center"
+      >
         <ProgressSpinner
           style="width: 50px; height: 50px"
           stroke-width="6"
