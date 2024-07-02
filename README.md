@@ -25,6 +25,7 @@ A desktop app to browse S3 buckets
       - [ ] Windows
       - [ ] Linux...? (Maybe no linux build for v1)
   - [x] Browder navigation controls
+  - [ ] Support pagination
   - [ ] Clean up UI
 - [ ] Transfers
   - [ ] Create transfer infrastructure
