@@ -13,6 +13,7 @@ import Connection from '@main/connections/Connection';
 import { getConnection } from '@main/connections';
 import { removeTransfer } from '.';
 import Transfer from './Transfer';
+import { prettyEta } from './utils';
 
 const pipeline = promisify(stream.pipeline);
 
@@ -24,6 +25,9 @@ export default class TransferDownload implements Transfer {
   downloadPath: string;
   totalBytes: number;
   downloadedBytes: number;
+  speed: number;
+  eta: string;
+  startTime: number;
   downloadStream: stream.Readable | undefined;
   writeStream: fs.WriteStream;
   isPaused: boolean;
@@ -36,6 +40,9 @@ export default class TransferDownload implements Transfer {
     this.downloadPath = input.downloadPath;
     this.totalBytes = 0;
     this.downloadedBytes = 0;
+    this.speed = -1;
+    this.eta = '';
+    this.startTime = -1;
     this.writeStream = fs.createWriteStream(input.downloadPath);
     this.isPaused = false;
     this.isCanceled = false;
@@ -82,7 +89,16 @@ export default class TransferDownload implements Transfer {
 
         this.status = 'running';
         this.downloadedBytes += chunk.length;
+        this.speed =
+          this.startTime !== -1
+            ? this.downloadedBytes / ((Date.now() - this.startTime) / 1000)
+            : 0;
+        this.eta =
+          this.speed !== -1
+            ? prettyEta((this.totalBytes - this.downloadedBytes) / this.speed)
+            : '';
 
+        if (this.startTime === -1) this.startTime = Date.now();
         this.sendUpdate();
         callback(null, chunk);
       },
@@ -113,6 +129,7 @@ export default class TransferDownload implements Transfer {
 
   pause() {
     this.isPaused = true;
+    this.startTime = -1;
     this.sendUpdate();
   }
 
@@ -149,6 +166,7 @@ export default class TransferDownload implements Transfer {
         currentBytes: this.downloadedBytes,
         totalBytes: this.totalBytes,
         percentage: (this.downloadedBytes / this.totalBytes) * 100,
+        speed: this.speed,
         eta: '0s',
       },
     };

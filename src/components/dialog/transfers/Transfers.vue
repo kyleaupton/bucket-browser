@@ -5,18 +5,18 @@
     header="Transfers"
     :style="{ width: '80vw' }"
   >
-    <template v-if="transfersArray.length">
+    <div v-if="transfersArray.length" class="flex flex-col gap-2">
       <TransferItem
         v-for="item in transfersArray"
         :key="item.id"
         :item="item"
       />
-    </template>
-    <template v-else>
+    </div>
+    <div v-else>
       <div class="flex justify-center items-center h-24">
         <p>No transfers</p>
       </div>
-    </template>
+    </div>
   </Dialog>
 </template>
 

@@ -35,6 +35,7 @@ export type SerializedTransfer = {
     currentBytes: number;
     totalBytes: number;
     percentage: number;
+    speed: number;
     eta: string;
   };
 };

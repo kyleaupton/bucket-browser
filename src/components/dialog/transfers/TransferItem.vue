@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-2 p-4 rounded-lg border">
+  <div class="flex flex-col gap-2 p-4 rounded-lg border border-neutral-700">
     <div class="flex justify-between items-center">
       <p>{{ item.name }}</p>
       <div class="flex gap-2">
@@ -13,16 +13,23 @@
     </div>
 
     <div class="flex items-center gap-3">
-      <div class="progress-bar-outer">
+      <div class="h-2 grow dark:bg-neutral-200 rounded">
         <div
-          class="progress-bar-inner"
+          class="progress-bar-inner dark:bg-green-500 h-full rounded"
+          :class="{ 'progress-bar-inner-paused': item.status === 'paused' }"
           :style="{ width: `${percentage}%` }"
         ></div>
       </div>
     </div>
 
-    <div class="flex justify-end">
-      <div class="text-sm">{{ bytes }}</div>
+    <div class="flex justify-end gap-8">
+      <div v-if="item.status === 'running'" class="text-meta">
+        {{ item.progress.eta }}
+      </div>
+      <div v-if="item.status === 'running'" class="text-meta">
+        {{ item.progress.speed }}
+      </div>
+      <div class="text-meta">{{ statusText }}</div>
     </div>
   </div>
 </template>
@@ -38,28 +45,29 @@ const props = defineProps<{
 }>();
 
 const percentage = computed(() => {
-  return props.item.status === 'initializing'
-    ? 0
-    : props.item.progress.percentage;
+  return props.item.status !== 'running' ? 0 : props.item.progress.percentage;
 });
 
 const bytes = computed(
   () =>
     `${prettyBytes(props.item.progress.currentBytes)} / ${prettyBytes(props.item.progress.totalBytes)}`,
 );
+
+const prettyStatus = computed(() => {
+  return props.item.status.charAt(0).toUpperCase() + props.item.status.slice(1);
+});
+
+const statusText = computed(() => {
+  return props.item.status !== 'running' ? prettyStatus.value : bytes.value;
+});
 </script>
 
 <style scoped>
-.progress-bar-outer {
-  flex-grow: 1;
-  height: 0.5rem;
-  background-color: #f1f1f1;
-  border-radius: 0.25rem;
+.progress-bar-inner-paused {
+  filter: grayscale(0.5);
 }
 
-.progress-bar-inner {
-  height: 100%;
-  background-color: #4caf50;
-  border-radius: 0.25rem;
+.text-meta {
+  @apply text-sm text-neutral-200;
 }
 </style>

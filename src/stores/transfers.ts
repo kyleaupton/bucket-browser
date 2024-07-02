@@ -12,21 +12,35 @@ type State = {
 
 export const useTransfersStore = defineStore('transfers', {
   state: (): State => ({
+    transfers: {},
     // transfers: {
     //   UPEAiAilPsZXkFIBSG94_: {
     //     id: 'UPEAiAilPsZXkFIBSG94_',
     //     name: 'example.txt',
     //     type: 'download',
-    //     status: 'initializing',
+    //     status: 'running',
     //     progress: {
     //       currentBytes: 905468082,
     //       totalBytes: 1270805003,
     //       percentage: 71.25153582669678,
+    //       speed: 0,
+    //       eta: '0s',
+    //     },
+    //   },
+    //   AAFADSFiAilPsZXkFIBSG94_: {
+    //     id: 'AAFADSFiAilPsZXkFIBSG94_',
+    //     name: 'example.txt',
+    //     type: 'download',
+    //     status: 'queued',
+    //     progress: {
+    //       currentBytes: 905468082,
+    //       totalBytes: 1270805003,
+    //       percentage: 71.25153582669678,
+    //       speed: 0,
     //       eta: '0s',
     //     },
     //   },
     // },
-    transfers: {},
   }),
 
   actions: {
@@ -44,7 +58,6 @@ export const useTransfersStore = defineStore('transfers', {
 
     registerTransferEvents() {
       window.onTransferUpdate((transfer) => {
-        console.log(transfer);
         this.updateTransfer(transfer);
       });
 

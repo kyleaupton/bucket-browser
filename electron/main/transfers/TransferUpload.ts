@@ -38,6 +38,7 @@ export default class TransferUpload implements Transfer {
         currentBytes: 0,
         totalBytes: 0,
         percentage: 0,
+        speed: 0,
         eta: '0s',
       },
     };
