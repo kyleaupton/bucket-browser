@@ -1,7 +1,7 @@
 <template>
   <div class="titlebar-drag relative h-12 shrink-0 flex justify-between p-2">
     <div
-      class="absolute flex gap-2 box-border h-12 p-2 -m-2"
+      class="absolute flex gap-2 h-12 p-2 -m-2"
       :class="{ 'left-[74px]': macosTitlebar }"
     >
       <Button
@@ -10,13 +10,6 @@
         severity="secondary"
         size="small"
         @click="toggleSidebar"
-      />
-      <Button
-        class="titlebar-nodrag"
-        icon="pi pi-plus"
-        severity="secondary"
-        size="small"
-        @click="showNewConnection"
       />
     </div>
 
@@ -40,7 +33,14 @@
       />
     </div>
 
-    <div class="absolute flex right-2 h-12 p-2 -m-2">
+    <div class="absolute flex gap-2 right-2 h-12 p-2 -m-2">
+      <Button
+        class="titlebar-nodrag"
+        icon="pi pi-plus"
+        severity="secondary"
+        size="small"
+        @click="showNewConnection"
+      />
       <Button
         class="titlebar-nodrag"
         icon="pi pi-arrow-right-arrow-left"
