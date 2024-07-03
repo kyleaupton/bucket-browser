@@ -22,12 +22,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import Menu from 'primevue/menu';
 import { addTransferChannel } from '@shared/ipc/transfers';
 import { useLayoutStore } from '@/stores';
+import { getObjectName, getExtension } from '@/utils';
 import { getKeyName, isBucket, isFolder, isObject, Item } from './utils';
-import { computed } from 'vue';
 
 const props = defineProps<{
   item: Item;
@@ -71,8 +71,9 @@ const thumbnail = computed(() => {
     return layoutStore.bucketIcon;
   } else if (isFolder(props.item)) {
     return layoutStore.folderIcon;
-  } else {
-    const ext = (getKeyName(props.item) || '').split('.').pop();
+  } else if (isObject(props.item) && props.item.Key) {
+    const name = getObjectName(props.item.Key);
+    const ext = getExtension(name);
 
     if (ext) {
       const icon = layoutStore.fileIcons[ext];
@@ -81,9 +82,9 @@ const thumbnail = computed(() => {
         return icon;
       }
     }
-
-    return layoutStore.defaultIcon;
   }
+
+  return layoutStore.defaultIcon;
 });
 
 const handleClick = () => {

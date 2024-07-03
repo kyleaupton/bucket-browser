@@ -1,7 +1,10 @@
 <template>
   <div class="flex flex-col gap-2 p-4 rounded-lg border border-neutral-700">
     <div class="flex justify-between items-center">
-      <p>{{ item.name }}</p>
+      <div class="flex items-center gap-2">
+        <img class="h-[32px] w-[32px]" :src="fileIcon" />
+        <p>{{ item.name }}</p>
+      </div>
       <div class="flex gap-2">
         <Button
           v-if="item.status !== 'paused'"
@@ -65,10 +68,19 @@ import {
   cancelTransferChannel,
 } from '@shared/ipc/transfers';
 import { SerializedTransfer } from '@shared/types/transfers';
+import { useLayoutStore } from '@/stores';
+import { getExtension } from '@/utils';
 
 const props = defineProps<{
   item: SerializedTransfer;
 }>();
+
+const layoutStore = useLayoutStore();
+
+const fileIcon = computed(() => {
+  const icon = layoutStore.fileIcons[getExtension(props.item.name)];
+  return icon || layoutStore.defaultIcon;
+});
 
 const percentage = computed(() => {
   return props.item.progress.totalBytes === 0

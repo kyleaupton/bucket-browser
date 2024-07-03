@@ -32,6 +32,10 @@ export default class TransferDownload implements Transfer {
    */
   downloadPath: string;
   /**
+   * Name of the object to download
+   */
+  name: string;
+  /**
    * Total bytes of the object to download
    */
   totalBytes: number;
@@ -69,6 +73,7 @@ export default class TransferDownload implements Transfer {
     this.status = 'queued';
     this.clientOptions = input.clientOptions;
     this.downloadPath = input.downloadPath;
+    this.name = input.clientOptions.Key.split('/').pop()!;
     this.totalBytes = 0;
     this.downloadedBytes = 0;
     this._downloadedBytes = 0;
@@ -208,7 +213,7 @@ export default class TransferDownload implements Transfer {
 
     return {
       id: this.id,
-      name: this.clientOptions.Key!,
+      name: this.name,
       type: 'download' as const,
       status: this.status,
       progress: {

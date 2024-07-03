@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-import { _Object } from '@aws-sdk/client-s3';
 import {
   getBucketImage,
   getFolderImage,
@@ -7,6 +6,9 @@ import {
   getOsChannel,
 } from '@shared/ipc/app';
 import { PersistedConnection } from '@shared/types/connections';
+import { isObject } from '@/components/browser/utils';
+import { getObjectName, getExtension } from '@/utils';
+import { useBrowserStore, useTransfersStore } from '.';
 
 export type DialogConnection = {
   name: 'connection';
@@ -39,6 +41,41 @@ export const useLayoutStore = defineStore('layout', {
     fileIcons: {},
   }),
 
+  getters: {
+    selectedBucket(state) {
+      return state.path.split('/')[1];
+    },
+    selectedObject(state) {
+      return state.path.split('/').slice(2).join('/');
+    },
+    browserExtensions() {
+      const browserStore = useBrowserStore();
+      const extensions: Record<string, string> = {};
+      for (const item of browserStore.items) {
+        if (isObject(item) && item.Key) {
+          // Get name of object from key
+          const name = getObjectName(item.Key);
+          const ext = getExtension(name);
+          if (ext) {
+            extensions[ext] = ext;
+          }
+        }
+      }
+      return extensions;
+    },
+    transferExtensions() {
+      const transfersStore = useTransfersStore();
+      const extensions: Record<string, string> = {};
+      for (const transfer of Object.values(transfersStore.transfers)) {
+        const ext = getExtension(transfer.name);
+        if (ext) {
+          extensions[ext] = ext;
+        }
+      }
+      return extensions;
+    },
+  },
+
   actions: {
     async getOs() {
       this.os = await window.ipcInvoke(getOsChannel);
@@ -52,7 +89,7 @@ export const useLayoutStore = defineStore('layout', {
       this.dialog = undefined;
     },
 
-    async getIcons() {
+    async getStandardIcons() {
       const res = await Promise.all([
         window.ipcInvoke(getBucketImage),
         window.ipcInvoke(getFolderImage),
@@ -64,33 +101,37 @@ export const useLayoutStore = defineStore('layout', {
       this.defaultIcon = res[2];
     },
 
-    async getFileIcons(contents: _Object[]) {
-      this.fileIcons = {};
-      const extenstions: string[] = [];
-
-      for (const obj of contents) {
-        const _obj = window.serialize(obj)[0];
-        if (_obj.Key) {
-          // If object is dotfile, remove the dot
-          if (_obj.Key.startsWith('.')) {
-            _obj.Key = _obj.Key.slice(1);
-          }
-
-          const ext = _obj.Key.split('.').pop();
-          if (ext) {
-            extenstions.push(ext);
-          }
+    async getFileIcons() {
+      const getImage = async (ext: string) => {
+        // If extension already has an icon, skip
+        if (this.fileIcons[ext]) {
+          return;
         }
-      }
 
-      const getImgae = async (ext: string) => {
+        console.log('Getting icon for', ext);
+
         this.fileIcons[ext] = await window.ipcInvoke(
           getObjectImage,
           `foo.${ext}`,
         );
       };
 
-      await Promise.all(extenstions.map(getImgae));
+      const allExtensions = {
+        ...this.browserExtensions,
+        ...this.transferExtensions,
+      };
+
+      await Promise.all(Object.keys(allExtensions).map(getImage));
+
+      // Clean up icons that are no longer needed
+      for (const ext of Object.keys(this.fileIcons)) {
+        if (allExtensions[ext] == null) {
+          console.log('Deleting icon for', ext);
+          delete this.fileIcons[ext];
+        }
+      }
+
+      console.log('--------------------------');
     },
   },
 });

@@ -20,7 +20,7 @@ const layoutStore = useLayoutStore();
 const transfersStore = useTransfersStore();
 
 connectionsStore.getConnections();
-layoutStore.getIcons();
+layoutStore.getStandardIcons();
 layoutStore.getOs();
 transfersStore.registerTransferEvents();
 

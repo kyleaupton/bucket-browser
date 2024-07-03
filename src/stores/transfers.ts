@@ -5,6 +5,7 @@ import {
   TransferInputDownload,
   TransferInputUpload,
 } from '@shared/types/transfers';
+import { useLayoutStore } from '.';
 
 type State = {
   transfers: Record<string, SerializedTransfer>;
@@ -23,8 +24,8 @@ export const useTransfersStore = defineStore('transfers', {
     //       currentBytes: 905468082,
     //       totalBytes: 1270805003,
     //       percentage: 71.25153582669678,
-    //       speed: 0,
-    //       eta: '0s',
+    //       speed: 1209310912,
+    //       eta: '0:10',
     //     },
     //   },
     //   AAFADSFiAilPsZXkFIBSG94_: {
@@ -33,9 +34,9 @@ export const useTransfersStore = defineStore('transfers', {
     //     type: 'download',
     //     status: 'queued',
     //     progress: {
-    //       currentBytes: 905468082,
-    //       totalBytes: 1270805003,
-    //       percentage: 71.25153582669678,
+    //       currentBytes: 0,
+    //       totalBytes: 0,
+    //       percentage: 0,
     //       speed: 0,
     //       eta: '0s',
     //     },
@@ -53,7 +54,18 @@ export const useTransfersStore = defineStore('transfers', {
     },
 
     updateTransfer(transfer: SerializedTransfer) {
+      let getIcon = false;
+      if (this.transfers[transfer.id] == null) {
+        // If a new transfer is added, get the file icon
+        getIcon = true;
+      }
+
       this.transfers[transfer.id] = transfer;
+
+      if (getIcon) {
+        const layoutStore = useLayoutStore();
+        layoutStore.getFileIcons();
+      }
     },
 
     registerTransferEvents() {
@@ -63,6 +75,8 @@ export const useTransfersStore = defineStore('transfers', {
 
       window.onTransferRemove((id) => {
         delete this.transfers[id];
+        const layoutStore = useLayoutStore();
+        layoutStore.getFileIcons();
       });
     },
   },

@@ -39,69 +39,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
+import { watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import ProgressSpinner from 'primevue/progressspinner';
-import { Bucket, _Object, CommonPrefix } from '@aws-sdk/client-s3';
-import {
-  listBucketsChannel,
-  listObjectsChannel,
-} from '@shared/ipc/connections';
-import { useLayoutStore } from '@/stores';
+import { useBrowserStore, useLayoutStore } from '@/stores';
 import BrowserItem from './BrowserItem.vue';
 
+const browserStore = useBrowserStore();
 const layoutStore = useLayoutStore();
+const { loading, fetching, items } = storeToRefs(browserStore);
 const { path, selectedConnection } = storeToRefs(layoutStore);
 
-const loading = ref(false);
-const fetching = ref(false);
-const items = ref<(Bucket | _Object | CommonPrefix)[]>([]);
-const selectedBucket = computed(() => path.value.split('/')[1]);
-const selectedObject = computed(() => path.value.split('/').slice(2).join('/'));
-
-watch(selectedConnection, () => fetchItems());
-watch(path, () => fetchItems());
-
-const fetchItems = async () => {
-  if (selectedConnection.value) {
-    items.value = [];
-    fetching.value = true;
-
-    // Only display spinner if fetching takes longer than .5 second
-    const timeout = setTimeout(() => {
-      loading.value = true;
-    }, 500);
-
-    if (!selectedBucket.value) {
-      const { Buckets } = await window.ipcInvoke(
-        listBucketsChannel,
-        selectedConnection.value.id,
-      );
-
-      items.value = Buckets || [];
-    } else {
-      const { Contents, CommonPrefixes } = await window.ipcInvoke(
-        listObjectsChannel,
-        selectedConnection.value.id,
-        {
-          Bucket: selectedBucket.value,
-          Prefix: selectedObject.value ? `${selectedObject.value}/` : '',
-          Delimiter: '/',
-        },
-      );
-
-      const _contents = Contents || [];
-      const _commonPrefixes = CommonPrefixes || [];
-
-      await layoutStore.getFileIcons(_contents);
-
-      items.value = [..._commonPrefixes, ..._contents];
-    }
-
-    loading.value = false;
-    clearTimeout(timeout);
-  }
-};
+watch(selectedConnection, browserStore.fetchItems);
+watch(path, browserStore.fetchItems);
 </script>
 
 <style>
