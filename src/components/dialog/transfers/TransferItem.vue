@@ -1,9 +1,10 @@
 <template>
   <div class="flex flex-col gap-2 p-4 rounded-lg border border-neutral-700">
-    <div class="flex justify-between items-center">
-      <div class="flex items-center gap-2">
+    <div class="flex justify-between items-center gap-2 overflow-hidden">
+      <div class="flex items-center gap-2 overflow-hidden">
         <img class="h-[32px] w-[32px]" :src="fileIcon" />
-        <p>{{ item.name }}</p>
+        <i :class="transferIcon"></i>
+        <p class="truncate">{{ item.name }}</p>
       </div>
       <div class="flex gap-2">
         <Button
@@ -80,6 +81,17 @@ const layoutStore = useLayoutStore();
 const fileIcon = computed(() => {
   const icon = layoutStore.fileIcons[getExtension(props.item.name)];
   return icon || layoutStore.defaultIcon;
+});
+
+const transferIcon = computed(() => {
+  switch (props.item.type) {
+    case 'download':
+      return 'pi pi-arrow-circle-down';
+    case 'upload':
+      return 'pi pi-arrow-circle-up';
+    default:
+      return '';
+  }
 });
 
 const percentage = computed(() => {
