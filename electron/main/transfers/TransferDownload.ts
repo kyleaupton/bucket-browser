@@ -1,4 +1,6 @@
-import fs from 'fs';
+import { createWriteStream, WriteStream } from 'fs';
+import fs from 'fs/promises';
+import path from 'path';
 import { promisify } from 'util';
 import stream from 'stream';
 import { BrowserWindow } from 'electron';
@@ -11,9 +13,9 @@ import {
 } from '@shared/types/transfers';
 import Connection from '@main/connections/Connection';
 import { getConnection } from '@main/connections';
-import { removeTransfer } from '.';
+import { exists, prettyEta } from '@main/utils';
 import Transfer from './Transfer';
-import { prettyEta } from './utils';
+import { removeTransfer } from '.';
 
 const pipeline = promisify(stream.pipeline);
 
@@ -21,31 +23,56 @@ export default class TransferDownload implements Transfer {
   id: string;
   status: TransferStatus;
   connection: Connection;
+  /**
+   * Options to pass to the S3 client to download the object
+   */
   clientOptions: GetObjectCommandInput;
+  /**
+   * Path to save the downloaded file
+   */
   downloadPath: string;
+  /**
+   * Total bytes of the object to download
+   */
   totalBytes: number;
+  /**
+   * Bytes downloaded overall
+   */
   downloadedBytes: number;
-  speed: number;
-  eta: string;
+  /**
+   * Downloaded bytes in the current session
+   */
+  _downloadedBytes: number;
+  /**
+   * Start time of the download for the current session
+   */
   startTime: number;
+  /**
+   * Stream to download the object
+   */
   downloadStream: stream.Readable | undefined;
-  writeStream: fs.WriteStream;
-  isPaused: boolean;
-  isCanceled: boolean;
+  /**
+   * Stream to write the downloaded object
+   */
+  writeStream: WriteStream | undefined;
+  /**
+   * Interval that sends updates to the renderer
+   */
+  interval: ReturnType<typeof setInterval> | undefined;
 
   constructor(input: TransferInputDownload) {
+    if (!input.clientOptions.Key) {
+      throw new Error('Object key not found');
+    }
+
     this.id = nanoid();
     this.status = 'queued';
     this.clientOptions = input.clientOptions;
     this.downloadPath = input.downloadPath;
     this.totalBytes = 0;
     this.downloadedBytes = 0;
-    this.speed = -1;
-    this.eta = '';
+    this._downloadedBytes = 0;
     this.startTime = -1;
-    this.writeStream = fs.createWriteStream(input.downloadPath);
-    this.isPaused = false;
-    this.isCanceled = false;
 
     const connection = getConnection(input.connectionId);
     if (!connection) {
@@ -58,9 +85,21 @@ export default class TransferDownload implements Transfer {
     this.removeTransfer = this.removeTransfer.bind(this);
   }
 
+  get tempPath() {
+    const dirname = path.dirname(this.downloadPath);
+    const basename = path.basename(this.downloadPath);
+    return path.join(dirname, `.download.${basename}`);
+  }
+
   private async initialize() {
     this.status = 'initializing';
     this.sendUpdate();
+
+    if (await exists(this.tempPath)) {
+      const stats = await fs.stat(this.tempPath);
+      this.downloadedBytes = stats.size;
+      this.clientOptions.Range = `bytes=${this.downloadedBytes}-`;
+    }
 
     const response = await this.connection.client.send(
       new GetObjectCommand(this.clientOptions),
@@ -70,45 +109,38 @@ export default class TransferDownload implements Transfer {
       throw new Error('Invalid response');
     }
 
-    this.totalBytes = response.ContentLength;
+    this.totalBytes = response.ContentRange
+      ? parseInt(response.ContentRange.split('/')[1])
+      : response.ContentLength;
     this.downloadStream = response.Body as stream.Readable;
   }
 
   private pipeStreams() {
+    if (!this.downloadStream) {
+      throw new Error('Download stream not found');
+    }
+
+    this.status = 'running';
+    this.writeStream = createWriteStream(this.tempPath, { flags: 'a' });
+    this.interval = setInterval(() => {
+      this.sendUpdate();
+    }, 500);
+
     const progressStream = new stream.Transform({
       transform: (chunk, encoding, callback) => {
-        if (this.isCanceled) {
-          callback(new Error('Download canceled'));
-          return;
-        }
-
-        if (this.isPaused) {
-          this.downloadStream!.pause();
-          return callback();
-        }
-
-        this.status = 'running';
         this.downloadedBytes += chunk.length;
-        this.speed =
-          this.startTime !== -1
-            ? this.downloadedBytes / ((Date.now() - this.startTime) / 1000)
-            : 0;
-        this.eta =
-          this.speed !== -1
-            ? prettyEta((this.totalBytes - this.downloadedBytes) / this.speed)
-            : '';
-
-        if (this.startTime === -1) this.startTime = Date.now();
-        this.sendUpdate();
+        this._downloadedBytes += chunk.length;
         callback(null, chunk);
       },
     });
 
-    pipeline(this.downloadStream!, progressStream, this.writeStream)
+    this.startTime = Date.now();
+    this._downloadedBytes = 0;
+
+    pipeline(this.downloadStream, progressStream, this.writeStream)
       .then(() => {
-        if (!this.isCanceled) {
-          this.removeTransfer();
-        }
+        console.log('TransferDownload: Download completed');
+        this.finishTransfer();
       })
       .catch((err) => {
         console.error('Error downloading object:', err);
@@ -120,27 +152,21 @@ export default class TransferDownload implements Transfer {
     this.pipeStreams();
   }
 
-  cancel() {
-    this.isCanceled = true;
-    this.downloadStream!.destroy();
-    this.writeStream.close();
-    this.sendUpdate();
+  async cancel() {
+    await fs.rm(this.tempPath);
+    this.removeTransfer();
   }
 
   pause() {
-    this.isPaused = true;
-    this.startTime = -1;
+    this.status = 'paused';
+    this.cleanUp();
     this.sendUpdate();
   }
 
   resume() {
-    if (this.isPaused) {
-      this.isPaused = false;
-      this.downloadStream!.resume();
-      this.pipeStreams();
+    if (this.status === 'paused') {
+      this.start();
     }
-
-    this.sendUpdate();
   }
 
   sendUpdate() {
@@ -149,25 +175,48 @@ export default class TransferDownload implements Transfer {
     );
   }
 
+  cleanUp() {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+    if (this.downloadStream) {
+      this.downloadStream.destroy();
+    }
+    if (this.writeStream) {
+      this.writeStream.close();
+    }
+  }
+
+  async finishTransfer() {
+    await fs.rename(this.tempPath, this.downloadPath);
+    this.removeTransfer();
+  }
+
   removeTransfer() {
     removeTransfer(this.id);
+    this.cleanUp();
+
     BrowserWindow.getAllWindows().forEach((window) =>
       window.webContents.send('/transfers/remove', this.id),
     );
   }
 
   serialize(): SerializedTransfer {
+    // For speed we want to calculate the speed based on the bytes downloaded in the current session
+    const speed =
+      this._downloadedBytes / ((Date.now() - this.startTime) / 1000);
+
     return {
       id: this.id,
-      name: this.clientOptions.Key || 'Unknown Name',
+      name: this.clientOptions.Key!,
       type: 'download' as const,
       status: this.status,
       progress: {
         currentBytes: this.downloadedBytes,
         totalBytes: this.totalBytes,
         percentage: (this.downloadedBytes / this.totalBytes) * 100,
-        speed: this.speed,
-        eta: '0s',
+        speed,
+        eta: prettyEta((this.totalBytes - this.downloadedBytes) / speed),
       },
     };
   }

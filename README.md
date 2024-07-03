@@ -19,11 +19,17 @@ A desktop app to browse S3 buckets
   - [x] Bucket/object traversal
   - [ ] OS native filesystem icons
     - [x] Spicific file icons
+      - [x] Mac
+      - [x] Windows
+      - [x] Linux
     - [x] Folder icon
+      - [x] Mac
+      - [ ] Windows
+      - [ ] Linux
     - [ ] Bucket Icon
       - [x] Mac
       - [ ] Windows
-      - [ ] Linux...? (Maybe no linux build for v1)
+      - [ ] Linux
   - [x] Browder navigation controls
   - [ ] Support pagination
   - [ ] Clean up UI
@@ -39,6 +45,7 @@ A desktop app to browse S3 buckets
   - [ ] Finish light mode colors
   - [ ] Create surface css vars for consistant background colors
   - [ ] Figure out how to properly theme `PrimeVue`
+  - [ ] Windows window controls
 - [ ] CI/CD
   - [ ] Get type checking hooked up
   - [ ] Write some tests

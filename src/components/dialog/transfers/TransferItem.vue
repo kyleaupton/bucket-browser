@@ -4,15 +4,36 @@
       <p>{{ item.name }}</p>
       <div class="flex gap-2">
         <Button
-          :icon="item.status === 'paused' ? 'pi pi-play' : 'pi pi-pause'"
+          v-if="item.status !== 'paused'"
+          icon="pi pi-pause"
           severity="secondary"
           size="small"
+          @click="pause"
         />
-        <Button icon="pi pi-times" severity="secondary" size="small" />
+        <Button
+          v-else
+          icon="pi pi-play"
+          severity="secondary"
+          size="small"
+          @click="resume"
+        />
+        <Button
+          icon="pi pi-times"
+          severity="secondary"
+          size="small"
+          @click="cancel"
+        />
       </div>
     </div>
 
-    <div class="flex items-center gap-3">
+    <div
+      v-if="
+        item.status === 'initializing' ||
+        item.status === 'running' ||
+        item.progress.percentage > 0
+      "
+      class="flex items-center gap-3"
+    >
       <div class="h-2 grow dark:bg-neutral-200 rounded">
         <div
           class="progress-bar-inner dark:bg-green-500 h-full rounded"
@@ -27,7 +48,7 @@
         {{ item.progress.eta }}
       </div>
       <div v-if="item.status === 'running'" class="text-meta">
-        {{ item.progress.speed }}
+        {{ prettySpeed }}
       </div>
       <div class="text-meta">{{ statusText }}</div>
     </div>
@@ -36,8 +57,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import prettyBytes from 'pretty-bytes';
+import prettyBytes, { Options } from 'pretty-bytes';
 import Button from 'primevue/button';
+import {
+  pauseTransferChannel,
+  resumeTransferChannel,
+  cancelTransferChannel,
+} from '@shared/ipc/transfers';
 import { SerializedTransfer } from '@shared/types/transfers';
 
 const props = defineProps<{
@@ -45,7 +71,9 @@ const props = defineProps<{
 }>();
 
 const percentage = computed(() => {
-  return props.item.status !== 'running' ? 0 : props.item.progress.percentage;
+  return props.item.progress.totalBytes === 0
+    ? 0
+    : props.item.progress.percentage;
 });
 
 const bytes = computed(
@@ -60,6 +88,25 @@ const prettyStatus = computed(() => {
 const statusText = computed(() => {
   return props.item.status !== 'running' ? prettyStatus.value : bytes.value;
 });
+
+const prettySpeed = computed(() =>
+  _prettyBytes(props.item.progress.speed, { bits: true }),
+);
+
+const _prettyBytes = (size: number, options?: Options) => {
+  const _opts: Options = options || {};
+
+  // @ts-expect-error - Says it's a read-only property but it's not
+  _opts.minimumFractionDigits = 2;
+  // @ts-expect-error - Says it's a read-only property but it's not
+  _opts.maximumFractionDigits = 2;
+
+  return prettyBytes(size, _opts);
+};
+
+const pause = () => window.ipcInvoke(pauseTransferChannel, props.item.id);
+const resume = () => window.ipcInvoke(resumeTransferChannel, props.item.id);
+const cancel = () => window.ipcInvoke(cancelTransferChannel, props.item.id);
 </script>
 
 <style scoped>

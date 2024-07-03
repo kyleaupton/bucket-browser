@@ -6,7 +6,13 @@ import {
   isTransferInputDownload,
   isTransferInputUpload,
 } from '@shared/types/transfers';
-import { getTransfersChannel, addTransferChannel } from '@shared/ipc/transfers';
+import {
+  getTransfersChannel,
+  addTransferChannel,
+  pauseTransferChannel,
+  resumeTransferChannel,
+  cancelTransferChannel,
+} from '@shared/ipc/transfers';
 
 export const registerTransfersIpc = () => {
   ipcHandle(getTransfersChannel, async () => {
@@ -33,5 +39,32 @@ export const registerTransfersIpc = () => {
 
     addTransfer(transfer);
     return transfer.serialize();
+  });
+
+  ipcHandle(pauseTransferChannel, async (event, id) => {
+    const transfer = getTransfers().get(id);
+    if (!transfer) {
+      throw new Error('Transfer not found');
+    }
+
+    transfer.pause();
+  });
+
+  ipcHandle(resumeTransferChannel, async (event, id) => {
+    const transfer = getTransfers().get(id);
+    if (!transfer) {
+      throw new Error('Transfer not found');
+    }
+
+    transfer.resume();
+  });
+
+  ipcHandle(cancelTransferChannel, async (event, id) => {
+    const transfer = getTransfers().get(id);
+    if (!transfer) {
+      throw new Error('Transfer not found');
+    }
+
+    transfer.cancel();
   });
 };

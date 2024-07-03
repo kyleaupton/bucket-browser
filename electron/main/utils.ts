@@ -1,3 +1,14 @@
+import fs from 'fs/promises';
+
+export const exists = async (path: string) => {
+  try {
+    await fs.stat(path);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
 export const prettyEta = (eta: number) => {
   const h = Math.floor(eta / 3600)
     .toString()
