@@ -51,6 +51,7 @@ export const useBrowserStore = defineStore('browser', {
       if (selectedConnection.value) {
         this.items = [];
         this.fetching = true;
+        const payload: Item[] = [];
 
         // Only display spinner if fetching takes longer than .5 second
         const timeout = setTimeout(() => {
@@ -63,7 +64,16 @@ export const useBrowserStore = defineStore('browser', {
             selectedConnection.value.id,
           );
 
-          this.items = Buckets || [];
+          for (const bucket of Buckets || []) {
+            if (bucket.Name) {
+              payload.push({
+                type: 'bucket',
+                key: bucket.Name,
+                name: bucket.Name,
+                creationDate: bucket.CreationDate,
+              });
+            }
+          }
         } else {
           const res = await window.ipcInvoke(
             listObjectsChannel,
@@ -76,16 +86,40 @@ export const useBrowserStore = defineStore('browser', {
             },
           );
 
+          console.log(res);
+
           if (res.IsTruncated && res.NextMarker) {
             this.pageMarkers.set(this.currentPage + 1, res.NextMarker);
           }
 
-          const _contents = res.Contents || [];
-          const _commonPrefixes = res.CommonPrefixes || [];
+          for (const item of res.CommonPrefixes || []) {
+            if (item.Prefix) {
+              const name = item.Prefix.split('/').filter(Boolean).pop()!;
 
-          this.items = [..._commonPrefixes, ..._contents];
+              payload.push({
+                type: 'folder',
+                key: item.Prefix,
+                name,
+              });
+            }
+          }
+
+          for (const item of res.Contents || []) {
+            if (item.Key) {
+              const name = item.Key.split('/').pop()!;
+
+              payload.push({
+                type: 'object',
+                key: item.Key,
+                name,
+                lastModified: item.LastModified,
+                size: item.Size,
+              });
+            }
+          }
         }
 
+        this.items = payload;
         await layoutStore.getFileIcons();
 
         this.loading = false;

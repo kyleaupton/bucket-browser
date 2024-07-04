@@ -6,8 +6,7 @@ import {
   getOsChannel,
 } from '@shared/ipc/app';
 import { PersistedConnection } from '@shared/types/connections';
-import { isObject } from '@/components/browser/utils';
-import { getObjectName, getExtension } from '@/utils';
+import { getExtension } from '@/utils';
 import { useBrowserStore, useTransfersStore } from '.';
 
 export type DialogConnection = {
@@ -52,10 +51,8 @@ export const useLayoutStore = defineStore('layout', {
       const browserStore = useBrowserStore();
       const extensions: Record<string, string> = {};
       for (const item of browserStore.items) {
-        if (isObject(item) && item.Key) {
-          // Get name of object from key
-          const name = getObjectName(item.Key);
-          const ext = getExtension(name);
+        if (item.type === 'object') {
+          const ext = getExtension(item.name);
           if (ext) {
             extensions[ext] = ext;
           }
@@ -108,8 +105,6 @@ export const useLayoutStore = defineStore('layout', {
           return;
         }
 
-        console.log('Getting icon for', ext);
-
         this.fileIcons[ext] = await window.ipcInvoke(
           getObjectImage,
           `foo.${ext}`,
@@ -126,12 +121,9 @@ export const useLayoutStore = defineStore('layout', {
       // Clean up icons that are no longer needed
       for (const ext of Object.keys(this.fileIcons)) {
         if (allExtensions[ext] == null) {
-          console.log('Deleting icon for', ext);
           delete this.fileIcons[ext];
         }
       }
-
-      console.log('--------------------------');
     },
   },
 });

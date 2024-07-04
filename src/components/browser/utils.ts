@@ -1,6 +1,26 @@
-import { Bucket, _Object, CommonPrefix } from '@aws-sdk/client-s3';
+interface ItemBase {
+  key: string;
+}
 
-export type Item = Bucket | _Object | CommonPrefix;
+export interface Bucket extends ItemBase {
+  type: 'bucket';
+  name: string;
+  creationDate?: Date;
+}
+
+export interface _Object extends ItemBase {
+  type: 'object';
+  name: string;
+  lastModified?: Date;
+  size?: number;
+}
+
+export interface Folder extends ItemBase {
+  type: 'folder';
+  name: string;
+}
+
+export type Item = Bucket | _Object | Folder;
 
 export const isBucket = (item: Item): item is Bucket => {
   return 'Name' in item;
@@ -12,16 +32,4 @@ export const isObject = (item: Item): item is _Object => {
 
 export const isFolder = (item: Item): boolean => {
   return 'Prefix' in item;
-};
-
-export const getKeyName = (item: Item) => {
-  if (isBucket(item)) {
-    return item.Name;
-  } else if (isObject(item)) {
-    const split = item.Key?.split('/') ?? [];
-    return split[split.length - 1] ?? '';
-  } else {
-    const split = item.Prefix?.split('/') ?? [];
-    return split[split.length - 2] ?? '';
-  }
 };

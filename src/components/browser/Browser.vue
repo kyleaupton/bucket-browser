@@ -25,16 +25,7 @@
         >
           No Items
         </div>
-        <RecycleScroller
-          v-else
-          v-slot="{ item }"
-          class="h-full w-full py-2"
-          :items="items"
-          :item-size="48"
-          key-field=""
-        >
-          <BrowserItem :item="item" />
-        </RecycleScroller>
+        <BrowserTable v-else :items="items" />
         <div
           v-if="isTruncated"
           class="flex justify-between items-center p-2 border-t dark:border-neutral-700"
@@ -69,7 +60,8 @@ import { storeToRefs } from 'pinia';
 import Button from 'primevue/button';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useBrowserStore, useLayoutStore } from '@/stores';
-import BrowserItem from './BrowserItem.vue';
+import BrowserTable from './BrowserTable.vue';
+// import BrowserItem from './BrowserItem.vue';
 
 const browserStore = useBrowserStore();
 const layoutStore = useLayoutStore();
