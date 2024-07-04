@@ -10,6 +10,8 @@ type State = {
   items: Item[];
   fetching: boolean;
   loading: boolean;
+  currentPage: number;
+  pageMarkers: Map<number, string>;
 };
 
 export const useBrowserStore = defineStore('browser', {
@@ -17,10 +19,31 @@ export const useBrowserStore = defineStore('browser', {
     items: [],
     fetching: false,
     loading: false,
+    currentPage: 1,
+    pageMarkers: new Map(),
   }),
 
+  getters: {
+    isTruncated(state) {
+      return state.pageMarkers.size > 0;
+    },
+  },
+
   actions: {
-    async fetchItems() {
+    async fetchItems({
+      nextPage = false,
+      prevPage = false,
+      clearPageMarkers = false,
+    } = {}) {
+      if (clearPageMarkers) {
+        this.pageMarkers.clear();
+        this.currentPage = 1;
+      } else if (nextPage) {
+        this.currentPage++;
+      } else if (prevPage) {
+        this.currentPage--;
+      }
+
       const layoutStore = useLayoutStore();
       const { selectedConnection, selectedBucket, selectedObject } =
         storeToRefs(layoutStore);
@@ -42,18 +65,23 @@ export const useBrowserStore = defineStore('browser', {
 
           this.items = Buckets || [];
         } else {
-          const { Contents, CommonPrefixes } = await window.ipcInvoke(
+          const res = await window.ipcInvoke(
             listObjectsChannel,
             selectedConnection.value.id,
             {
               Bucket: selectedBucket.value,
               Prefix: selectedObject.value ? `${selectedObject.value}/` : '',
               Delimiter: '/',
+              Marker: this.pageMarkers.get(this.currentPage),
             },
           );
 
-          const _contents = Contents || [];
-          const _commonPrefixes = CommonPrefixes || [];
+          if (res.IsTruncated && res.NextMarker) {
+            this.pageMarkers.set(this.currentPage + 1, res.NextMarker);
+          }
+
+          const _contents = res.Contents || [];
+          const _commonPrefixes = res.CommonPrefixes || [];
 
           this.items = [..._commonPrefixes, ..._contents];
         }
