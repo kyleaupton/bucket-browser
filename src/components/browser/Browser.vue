@@ -1,31 +1,15 @@
 <template>
   <div
     v-if="!selectedConnection"
-    class="h-full select-none flex justify-center items-center"
+    class="h-full select-none flex justify-center items-center rounded-lg dark:bg-neutral-900"
   >
-    <div>No Connection Selected</div>
+    <div class="text-neutral-300">No Connection Selected</div>
   </div>
 
-  <div v-else class="flex flex-col h-full">
+  <div v-else class="flex flex-col h-full rounded-lg dark:bg-neutral-900">
     <div class="flex flex-grow overflow-hidden">
-      <div
-        v-if="loading"
-        class="h-full w-full flex justify-center items-center"
-      >
-        <ProgressSpinner
-          style="width: 50px; height: 50px"
-          stroke-width="6"
-          animation-duration=".5s"
-        />
-      </div>
-      <div v-else class="flex flex-col h-full w-full">
-        <div
-          v-if="!items.length && !fetching"
-          class="h-full w-full select-none flex justify-center items-center"
-        >
-          No Items
-        </div>
-        <BrowserTable v-else :items="items" />
+      <div class="flex flex-col h-full w-full">
+        <BrowserTable :items="items" />
         <div
           v-if="isTruncated"
           class="flex justify-between items-center p-2 border-t dark:border-neutral-700"
@@ -58,14 +42,13 @@
 import { watch, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import Button from 'primevue/button';
-import ProgressSpinner from 'primevue/progressspinner';
 import { useBrowserStore, useLayoutStore } from '@/stores';
 import BrowserTable from './BrowserTable.vue';
 // import BrowserItem from './BrowserItem.vue';
 
 const browserStore = useBrowserStore();
 const layoutStore = useLayoutStore();
-const { loading, fetching, items, isTruncated, currentPage, pageMarkers } =
+const { items, isTruncated, currentPage, pageMarkers } =
   storeToRefs(browserStore);
 const { path, selectedConnection } = storeToRefs(layoutStore);
 

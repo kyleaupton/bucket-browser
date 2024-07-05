@@ -33,5 +33,6 @@ window.serialize = serialize;
   flex-direction: column;
   height: 100vh;
   width: 100vw;
+  @apply bg-neutral-950;
 }
 </style>

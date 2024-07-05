@@ -1,5 +1,7 @@
 <template>
-  <div class="titlebar-drag relative h-12 shrink-0 flex justify-between p-2">
+  <div
+    class="titlebar-drag relative h-12 shrink-0 flex justify-between p-2 dark:bg-neutral-900"
+  >
     <div
       class="absolute flex gap-2 h-12 p-2 -m-2"
       :class="{ 'left-[74px]': macosTitlebar }"

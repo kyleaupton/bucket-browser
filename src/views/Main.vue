@@ -1,5 +1,5 @@
 <template>
-  <div class="main border-t dark:border-neutral-700">
+  <div class="main m-3 rounded" :class="{ 'ml-0': sidebar?.isCollapsed }">
     <SplitterGroup
       id="splitter-group-1"
       direction="horizontal"
@@ -17,8 +17,7 @@
       </SplitterPanel>
       <SplitterResizeHandle
         id="splitter-resize-handle-1"
-        class="w-[1px] dark:bg-neutral-700"
-        :class="{ 'bg-transparent dark:bg-transparent': sidebar?.isCollapsed }"
+        class="w-3 bg-transparent"
       />
       <SplitterPanel id="splitter-panel-2" :size="65" :min-size="65">
         <Browser />
@@ -48,6 +47,6 @@ emitter.on('toggle-sidebar', toggleSidebar);
 <style scoped>
 .main {
   height: 100%;
-  max-height: calc(100dvh - 3rem); /* 3rem is hight of titlebar */
+  max-height: calc(100dvh - 3rem - 1.5rem); /* 3rem is hight of titlebar */
 }
 </style>
