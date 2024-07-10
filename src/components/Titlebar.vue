@@ -23,7 +23,13 @@
         size="small"
         @click="goBack"
       />
-
+      <Button
+        class="titlebar-nodrag"
+        icon="pi pi-arrow-right"
+        severity="secondary"
+        size="small"
+        @click="goBack"
+      />
       <Select
         v-model="selected"
         class="titlebar-nodrag titlebar-select w-full"
@@ -36,13 +42,6 @@
     </div>
 
     <div class="absolute flex gap-2 right-2 h-12 p-2 -m-2">
-      <Button
-        class="titlebar-nodrag"
-        icon="pi pi-plus"
-        severity="secondary"
-        size="small"
-        @click="showNewConnection"
-      />
       <Button
         class="titlebar-nodrag"
         icon="pi pi-arrow-right-arrow-left"
@@ -130,7 +129,6 @@ const goBack = () => {
 };
 
 const showTransfers = () => layoutStore.setDialog({ name: 'transfers' });
-const showNewConnection = () => layoutStore.setDialog({ name: 'connection' });
 const toggleSidebar = () => emitter.emit('toggle-sidebar');
 </script>
 

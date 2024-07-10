@@ -41,6 +41,7 @@
     "eslint-plugin-vue": "^9.26.0",
     "lowdb": "^7.0.1",
     "nanoid": "^5.0.7",
+    "overlayscrollbars": "^2.9.2",
     "pinia": "^2.1.7",
     "postcss": "^8.4.38",
     "prettier": "^3.3.2",

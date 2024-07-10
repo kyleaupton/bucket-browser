@@ -8,6 +8,7 @@ import {
 import { PersistedConnection } from '@shared/types/connections';
 import { getExtension } from '@/utils';
 import { useBrowserStore, useTransfersStore } from '.';
+import { VNodeRef } from 'vue';
 
 export type DialogConnection = {
   name: 'connection';
@@ -26,6 +27,12 @@ type State = {
   bucketIcon: string;
   defaultIcon: string;
   fileIcons: Record<string, string>;
+  contextMenu: VNodeRef | undefined;
+  contextMenuOptions: Array<{
+    label: string;
+    icon: string;
+    command: () => void;
+  }>;
 };
 
 export const useLayoutStore = defineStore('layout', {
@@ -38,6 +45,8 @@ export const useLayoutStore = defineStore('layout', {
     bucketIcon: '',
     defaultIcon: '',
     fileIcons: {},
+    contextMenu: undefined,
+    contextMenuOptions: [],
   }),
 
   getters: {

@@ -1,3 +1,4 @@
+import { StyleValue } from 'vue';
 import { defineStore, storeToRefs } from 'pinia';
 import {
   listBucketsChannel,
@@ -6,12 +7,20 @@ import {
 import { Item } from '@/components/browser/utils';
 import { useLayoutStore } from './layout';
 
+interface Column {
+  key: string;
+  title: string;
+  style: StyleValue;
+  sortable: boolean;
+}
+
 type State = {
   items: Item[];
   fetching: boolean;
   loading: boolean;
   currentPage: number;
   pageMarkers: Map<number, string>;
+  columns: Column[];
 };
 
 export const useBrowserStore = defineStore('browser', {
@@ -21,9 +30,34 @@ export const useBrowserStore = defineStore('browser', {
     loading: false,
     currentPage: 1,
     pageMarkers: new Map(),
+    columns: [
+      {
+        key: 'icon',
+        title: '',
+        style: 'width: 32px; flex-shrink: 0; box-sizing: content-box;',
+        sortable: false,
+      },
+      { key: 'name', title: 'Name', style: 'flex-grow: 1', sortable: true },
+      {
+        key: 'size',
+        title: 'Size',
+        style: 'width: 62px; flex-shrink: 0; box-sizing: content-box;',
+        sortable: true,
+      },
+      {
+        key: 'more',
+        title: '',
+        style: 'width: 62px; flex-shrink: 0',
+        sortable: false,
+      },
+    ],
   }),
 
   getters: {
+    itemsSorted(state) {
+      return state.items;
+    },
+
     isTruncated(state) {
       return state.pageMarkers.size > 0;
     },
