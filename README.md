@@ -30,17 +30,22 @@ A desktop app to browse S3 buckets
       - [x] Mac
       - [ ] Windows
       - [ ] Linux
-  - [x] Browder navigation controls
-  - [ ] Support pagination
+  - [x] Browser navigation controls
+  - [x] Support pagination
   - [ ] Clean up UI
 - [ ] Transfers
   - [ ] Create transfer infrastructure
   - [ ] Create `TransferUpload`
-  - [ ] Create `TransferDownload`
-  - [ ] Figure out how to send status updates to the UI
+  - [x] Create `TransferDownload`
+  - [x] Figure out how to send status updates to the UI
   - [ ] Create UI for transfers
   - [ ] Impliment pause, resume, cancel
+    - [ ] Upload
+    - [x] Download
   - [ ] Add logic for read/write vs. just read
+  - [ ] Support folder downloads
+  - [ ] Support folder uploads
+  - [ ] Add conformation before transfers for budgetary reasons
 - [ ] UI
   - [ ] Finish light mode colors
   - [ ] Create surface css vars for consistant background colors
