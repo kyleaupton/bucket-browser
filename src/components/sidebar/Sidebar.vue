@@ -1,7 +1,6 @@
 <template>
   <div class="relative flex flex-col h-full p-2 rounded-lg dark:bg-neutral-900">
-    <div class="flex items-center justify-between gap-2 mx-2 mb-2">
-      <!-- <i class="pi pi-cloud" style="font-size: 1.2rem"></i> -->
+    <div class="flex items-center justify-between gap-2 mx-2">
       <div class="dark:text-neutral-300">Connections</div>
       <Button
         icon="pi pi-plus"

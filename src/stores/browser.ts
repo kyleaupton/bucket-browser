@@ -7,7 +7,7 @@ import {
 import { Item } from '@/components/browser/utils';
 import { useLayoutStore } from './layout';
 
-interface Column {
+export interface Column {
   key: string;
   title: string;
   style: StyleValue;
@@ -21,6 +21,10 @@ type State = {
   currentPage: number;
   pageMarkers: Map<number, string>;
   columns: Column[];
+  sort: {
+    key: string;
+    order: 'asc' | 'desc';
+  };
 };
 
 export const useBrowserStore = defineStore('browser', {
@@ -51,10 +55,39 @@ export const useBrowserStore = defineStore('browser', {
         sortable: false,
       },
     ],
+    sort: {
+      key: '',
+      order: 'asc',
+    },
   }),
 
   getters: {
     itemsSorted(state) {
+      if (state.sort.key === 'name') {
+        return state.items.slice().sort((a, b) => {
+          const _a = state.sort.order === 'asc' ? a : b;
+          const _b = state.sort.order === 'asc' ? b : a;
+
+          return _a.name.localeCompare(_b.name);
+        });
+      } else if (state.sort.key === 'size') {
+        return state.items.slice().sort((a, b) => {
+          const _a = state.sort.order === 'asc' ? a : b;
+          const _b = state.sort.order === 'asc' ? b : a;
+
+          if (
+            _a.type === 'object' &&
+            _b.type === 'object' &&
+            _a.size != null &&
+            _b.size != null
+          ) {
+            return _b.size - _a.size;
+          }
+
+          return -1;
+        });
+      }
+
       return state.items;
     },
 
@@ -159,6 +192,20 @@ export const useBrowserStore = defineStore('browser', {
         this.loading = false;
         this.fetching = false;
         clearTimeout(timeout);
+      }
+    },
+
+    setSort(key: string) {
+      if (this.sort.key === key) {
+        if (this.sort.order === 'asc') {
+          this.sort.order = 'desc';
+        } else if (this.sort.order === 'desc') {
+          this.sort.key = '';
+          this.sort.order = 'asc';
+        }
+      } else {
+        this.sort.key = key;
+        this.sort.order = 'asc';
       }
     },
   },

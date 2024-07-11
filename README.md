@@ -33,6 +33,7 @@ A desktop app to browse S3 buckets
   - [x] Browser navigation controls
   - [x] Support pagination
   - [ ] Clean up UI
+  - [ ] Error handling
 - [ ] Transfers
   - [ ] Create transfer infrastructure
   - [ ] Create `TransferUpload`

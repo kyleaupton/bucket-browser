@@ -6,9 +6,12 @@
     }"
     @click.self="selectConnection"
   >
-    <p class="truncate" @click="selectConnection">
-      {{ props.connection.nickname }}
-    </p>
+    <div class="flex gap-2 items-center overflow-hidden">
+      <i class="pi pi-cloud" style="font-size: 1.2rem"></i>
+      <p class="truncate" @click="selectConnection">
+        {{ props.connection.nickname }}
+      </p>
+    </div>
 
     <div
       class="sidebar-item-icon justify-center items-center p-[3px] rounded-lg"
