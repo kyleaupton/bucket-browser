@@ -1,3 +1,6 @@
+import { BrowserWindow } from 'electron';
+import keytar from 'keytar';
+import { throwIpcError } from 'typed-electron-ipc';
 import {
   S3Client,
   ListBucketsCommand,
@@ -16,32 +19,70 @@ import {
 export default class Connection {
   id: string;
   nickname: string;
+  accessKeyId: string;
+  secretAccessKey: string | null;
   config: PersistedConnectionConfig;
-  client: S3Client;
+  client: S3Client | undefined;
+  error: string | undefined;
 
   constructor(connection: PersistedConnection) {
+    console.log('constructor', connection);
     this.id = connection.id;
     this.nickname = connection.nickname;
+    this.accessKeyId = connection.accessKeyId;
+    this.secretAccessKey = null;
     this.config = connection.config;
+    this.error = undefined;
+  }
 
-    this.client = new S3Client(this.config);
+  async initialize() {
+    this.secretAccessKey = await keytar.getPassword('bucket-browser', this.id);
+
+    if (this.secretAccessKey == null) {
+      this.error = 'Secret access key not found';
+    } else {
+      this.client = new S3Client({
+        ...this.config,
+        credentials: {
+          accessKeyId: this.accessKeyId,
+          secretAccessKey: this.secretAccessKey,
+        },
+      });
+    }
+
+    this.sendUpdate();
   }
 
   async listBuckets() {
+    if (!this.client) {
+      return throwIpcError('S3 Client not initialized');
+    }
+
     return this.client.send(new ListBucketsCommand());
   }
 
   async listObjects(input: ListObjectsCommandInput) {
+    if (!this.client) {
+      return throwIpcError('S3 Client not initialized');
+    }
+
     return this.client.send(new ListObjectsCommand(input));
   }
 
-  // Not being used rn
   serialize(): SerializedConnection {
     return {
       id: this.id,
       nickname: this.nickname,
+      accessKeyId: this.accessKeyId,
+      secretAccessKey: this.secretAccessKey,
       config: this.config,
-      connected: true,
+      error: this.error,
     };
+  }
+
+  sendUpdate() {
+    BrowserWindow.getAllWindows().forEach((win) => {
+      win.webContents.send('/connections/update', this.serialize());
+    });
   }
 }

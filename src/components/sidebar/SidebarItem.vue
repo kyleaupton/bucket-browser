@@ -15,59 +15,25 @@
 
     <div
       class="sidebar-item-icon justify-center items-center p-[3px] rounded-lg"
-      @click="toggle"
+      @click="toggleMenu"
     >
       <i class="pi pi-ellipsis-h"></i>
     </div>
   </div>
-
-  <Menu id="overlay_menu" ref="menu" :model="items" :popup="true" />
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import Menu from 'primevue/menu';
+import { computed } from 'vue';
 import { useConnectionsStore, useLayoutStore } from '@/stores';
 import { showMessageChannel } from '@shared/ipc/dialog';
-import { PersistedConnection } from '@shared/types/connections';
+import { SerializedConnection } from '@shared/types/connections';
 
 const connectionsStore = useConnectionsStore();
 const layoutStore = useLayoutStore();
 
 const props = defineProps<{
-  connection: PersistedConnection;
+  connection: SerializedConnection;
 }>();
-
-const menu = ref();
-const items = ref([
-  {
-    label: 'Options',
-    items: [
-      {
-        label: 'Edit',
-        icon: 'pi pi-pencil',
-        command: () => {
-          layoutStore.setDialog({ name: 'connection', data: props.connection });
-        },
-      },
-      {
-        label: 'Delete',
-        icon: 'pi pi-trash',
-        command: async () => {
-          const { response } = await window.ipcInvoke(showMessageChannel, {
-            message: 'Are you sure you want do delete this connection?',
-            type: 'question',
-            buttons: ['Yes', 'Cancel'],
-          });
-
-          if (response === 0) {
-            await connectionsStore.removeConnection(props.connection);
-          }
-        },
-      },
-    ],
-  },
-]);
 
 const selected = computed(
   () => layoutStore.selectedConnection?.id === props.connection.id,
@@ -78,8 +44,36 @@ const selectConnection = () => {
   layoutStore.path = '';
 };
 
-const toggle = (event: MouseEvent) => {
-  menu.value.toggle(event);
+const toggleMenu = (event: MouseEvent) => {
+  layoutStore.contextMenuOptions = [
+    {
+      label: 'Edit',
+      icon: 'pi pi-pencil',
+      command: () => {
+        layoutStore.setDialog({
+          name: 'connection',
+          data: props.connection,
+        });
+      },
+    },
+    {
+      label: 'Delete',
+      icon: 'pi pi-trash',
+      command: async () => {
+        const { response } = await window.ipcInvoke(showMessageChannel, {
+          message: 'Are you sure you want do delete this connection?',
+          type: 'question',
+          buttons: ['Yes', 'Cancel'],
+        });
+
+        if (response === 0) {
+          await connectionsStore.removeConnection(props.connection.id);
+        }
+      },
+    },
+  ];
+
+  layoutStore.contextMenu.toggle(event);
 };
 </script>
 

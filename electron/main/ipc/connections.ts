@@ -1,3 +1,4 @@
+import keytar from 'keytar';
 import { ipcHandle, throwIpcError } from 'typed-electron-ipc';
 import {
   getConnectionsChannel,
@@ -10,39 +11,61 @@ import {
 import Connection from '@main/connections/Connection';
 import {
   getConnection,
+  getConnections,
   addConnection,
   removeConnection,
 } from '@main/connections';
 import db from '@main/db';
+import { PersistedConnection } from '@shared/types/connections';
 
 export const registerConnectionsIpc = () => {
   ipcHandle(getConnectionsChannel, async () => {
-    return db.data.connections;
+    return getConnections();
   });
 
   ipcHandle(addConnectionChannel, async (event, connection) => {
-    addConnection(new Connection(connection));
+    await keytar.setPassword(
+      'bucket-browser',
+      connection.id,
+      connection.secretAccessKey,
+    );
+
+    const persisted: PersistedConnection = {
+      nickname: connection.nickname,
+      id: connection.id,
+      config: connection.config,
+      accessKeyId: connection.accessKeyId,
+    };
+
+    const conn = new Connection(persisted);
+    await conn.initialize();
+    addConnection(conn);
 
     await db.update((data) => {
-      const index = data.connections.findIndex(
-        (conn) => conn.id === connection.id,
-      );
+      const index = data.connections.findIndex((c) => c.id === persisted.id);
 
       if (index === -1) {
-        data.connections.push(connection);
+        data.connections.push(persisted);
       }
     });
   });
 
   ipcHandle(editConnectionChannel, async (event, connection) => {
-    removeConnection(connection.id);
-    addConnection(new Connection(connection));
+    // TODO: Edit in a way that doesn't just remove/add a new connection
+    await keytar.setPassword(
+      'bucket-browser',
+      connection.id,
+      connection.secretAccessKey,
+    );
 
-    // Update db entry
+    removeConnection(connection.id);
+
+    const conn = new Connection(connection);
+    await conn.initialize();
+    addConnection(conn);
+
     await db.update((data) => {
-      const index = data.connections.findIndex(
-        (conn) => conn.id === connection.id,
-      );
+      const index = data.connections.findIndex((c) => c.id === connection.id);
 
       if (index !== -1) {
         data.connections[index] = connection;
@@ -51,6 +74,8 @@ export const registerConnectionsIpc = () => {
   });
 
   ipcHandle(removeConnectionChannel, async (event, connectionId) => {
+    await keytar.deletePassword('bucket-browser', connectionId);
+
     removeConnection(connectionId);
 
     // Remove db entry

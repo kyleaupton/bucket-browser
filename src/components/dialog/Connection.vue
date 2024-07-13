@@ -29,7 +29,7 @@
       <label for="access-key" class="font-semibold w-24">Access Key</label>
       <InputText
         id="access-key"
-        v-model="persistedConnection.config.credentials.accessKeyId"
+        v-model="persistedConnection.accessKeyId"
         class="flex-auto"
         size="small"
       />
@@ -39,7 +39,7 @@
       <label for="secret-key" class="font-semibold w-24">Secret Key</label>
       <InputText
         id="secret-key"
-        v-model="persistedConnection.config.credentials.secretAccessKey"
+        v-model="persistedConnection.secretAccessKey"
         class="flex-auto"
         size="small"
       />
@@ -79,7 +79,7 @@ import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import ToggleSwitch from 'primevue/toggleswitch';
 import Button from 'primevue/button';
-import { PersistedConnection } from '@shared/types/connections';
+import { NewConnection } from '@shared/types/connections';
 import {
   useLayoutStore,
   useConnectionsStore,
@@ -112,25 +112,26 @@ const _dialog = computed(() => {
     | undefined;
 });
 
-const defaultConnection: PersistedConnection = {
+const defaultConnection: NewConnection = {
   id: nanoid(),
   nickname: '',
+  accessKeyId: '',
+  secretAccessKey: '',
   config: {
     region: 'us-east-1',
     endpoint: 'https://s3.amazonaws.com',
-    credentials: {
-      accessKeyId: '',
-      secretAccessKey: '',
-    },
   },
 };
 
-let persistedConnection = ref<PersistedConnection>(defaultConnection);
+let persistedConnection = ref<NewConnection>(defaultConnection);
 
 watch(visible, () => {
   if (_dialog?.value?.data) {
-    persistedConnection = ref<PersistedConnection>(
-      ...window.serialize(_dialog.value.data),
+    persistedConnection = ref<NewConnection>(
+      ...window.serialize({
+        ..._dialog.value.data,
+        secretAccessKey: _dialog.value.data.secretAccessKey || '',
+      }),
     );
   } else {
     persistedConnection.value = defaultConnection;

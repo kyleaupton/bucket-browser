@@ -5,11 +5,11 @@ import {
   editConnectionChannel,
   removeConnectionChannel,
 } from '@shared/ipc/connections';
-import { PersistedConnection } from '@shared/types/connections';
+import { SerializedConnection, NewConnection } from '@shared/types/connections';
 
 type State = {
   selectedConnection: string | undefined;
-  connections: PersistedConnection[];
+  connections: SerializedConnection[];
 };
 
 export const useConnectionsStore = defineStore('connections', {
@@ -27,7 +27,7 @@ export const useConnectionsStore = defineStore('connections', {
       this.selectedConnection = connectionId;
     },
 
-    async addConnection(connection: PersistedConnection) {
+    async addConnection(connection: NewConnection) {
       await window.ipcInvoke(
         addConnectionChannel,
         ...window.serialize(connection),
@@ -35,7 +35,7 @@ export const useConnectionsStore = defineStore('connections', {
       await this.getConnections();
     },
 
-    async editConnection(connection: PersistedConnection) {
+    async editConnection(connection: NewConnection) {
       await window.ipcInvoke(
         editConnectionChannel,
         ...window.serialize(connection),
@@ -43,8 +43,8 @@ export const useConnectionsStore = defineStore('connections', {
       await this.getConnections();
     },
 
-    async removeConnection(connection: PersistedConnection) {
-      await window.ipcInvoke(removeConnectionChannel, connection.id);
+    async removeConnection(connectionId: string) {
+      await window.ipcInvoke(removeConnectionChannel, connectionId);
       await this.getConnections();
     },
   },

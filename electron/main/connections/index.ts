@@ -8,6 +8,7 @@ export const initializeConnections = () => {
   for (const connection of persisted) {
     const conn = new Connection(connection);
     connections.set(conn.id, conn);
+    conn.initialize();
   }
 };
 

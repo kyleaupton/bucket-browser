@@ -4,17 +4,17 @@ import {
   ListObjectsCommandOutput,
 } from '@aws-sdk/client-s3';
 import { IpcChannel } from 'typed-electron-ipc';
-import { PersistedConnection } from '@shared/types/connections';
+import { SerializedConnection, NewConnection } from '@shared/types/connections';
 
-export const getConnectionsChannel: IpcChannel<[], PersistedConnection[]> = {
+export const getConnectionsChannel: IpcChannel<[], SerializedConnection[]> = {
   name: '/connections/get',
 };
 
-export const addConnectionChannel: IpcChannel<[PersistedConnection], void> = {
+export const addConnectionChannel: IpcChannel<[NewConnection], void> = {
   name: '/connections/add',
 };
 
-export const editConnectionChannel: IpcChannel<[PersistedConnection], void> = {
+export const editConnectionChannel: IpcChannel<[NewConnection], void> = {
   name: '/connections/edit',
 };
 

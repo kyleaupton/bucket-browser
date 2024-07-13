@@ -5,14 +5,14 @@ import {
   getObjectImage,
   getOsChannel,
 } from '@shared/ipc/app';
-import { PersistedConnection } from '@shared/types/connections';
+import { SerializedConnection } from '@shared/types/connections';
 import { getExtension } from '@/utils';
 import { useBrowserStore, useTransfersStore } from '.';
 import { VNodeRef } from 'vue';
 
 export type DialogConnection = {
   name: 'connection';
-  data?: PersistedConnection;
+  data?: SerializedConnection;
 };
 export type DialogTransfers = { name: 'transfers' };
 export type Dialog = DialogConnection | DialogTransfers;
@@ -20,7 +20,7 @@ export type Dialog = DialogConnection | DialogTransfers;
 type State = {
   // eslint-disable-next-line
   os: NodeJS.Platform | undefined;
-  selectedConnection: PersistedConnection | undefined;
+  selectedConnection: SerializedConnection | undefined;
   path: string;
   dialog: Dialog | undefined;
   folderIcon: string;
