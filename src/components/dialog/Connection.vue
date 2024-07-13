@@ -36,12 +36,15 @@
     </div>
 
     <div class="flex items-center gap-4 mb-4">
-      <label for="secret-key" class="font-semibold w-24">Secret Key</label>
-      <InputText
+      <label for="secret-key" class="font-semibold w-24 shrink-0"
+        >Secret Key</label
+      >
+      <Password
         id="secret-key"
         v-model="persistedConnection.secretAccessKey"
-        class="flex-auto"
+        :feedback="false"
         size="small"
+        toggle-mask
       />
     </div>
 
@@ -79,6 +82,7 @@ import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import ToggleSwitch from 'primevue/toggleswitch';
 import Button from 'primevue/button';
+import Password from 'primevue/password';
 import { NewConnection } from '@shared/types/connections';
 import {
   useLayoutStore,
@@ -162,4 +166,17 @@ const save = async () => {
 };
 </script>
 
-<style scoped></style>
+<style>
+#secret-key,
+#secret-key input {
+  width: 100%;
+}
+
+#secret-key input {
+  /* Because there's no small size for the password input */
+  padding-top: var(--p-inputtext-sm-padding-y);
+  padding-bottom: var(--p-inputtext-sm-padding-y);
+  padding-left: var(--p-inputtext-sm-padding-x);
+  font-size: var(--p-inputtext-sm-font-size);
+}
+</style>

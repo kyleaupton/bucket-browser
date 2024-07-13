@@ -78,7 +78,6 @@ export const registerConnectionsIpc = () => {
 
     removeConnection(connectionId);
 
-    // Remove db entry
     await db.update((data) => {
       data.connections = data.connections.filter(
         (conn) => conn.id !== connectionId,

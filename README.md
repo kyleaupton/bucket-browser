@@ -8,11 +8,11 @@ A desktop app to browse S3 buckets
 ## Todo
 
 - [ ] Finish `README`
-- [ ] Connection CRUD
+- [x] Connection CRUD
   - [x] Add ability to create new connection
   - [x] Add ability to edit existing connection
-  - [ ] Store access secrets in key store (use `Keytar` package)
-  - [ ] Make access secret input a password input
+  - [x] Store access secrets in key store (use `Keytar` package)
+  - [x] Make access secret input a password input
 - [ ] Connection browsing
   - [x] List buckets
   - [x] List objects
