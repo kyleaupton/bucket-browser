@@ -1,9 +1,8 @@
 import { dialog, BrowserWindow } from 'electron';
-import { ipcHandle } from 'typed-electron-ipc';
-import { showMessageChannel } from '@shared/ipc/dialog';
+import { createIpcHandlers } from 'typed-electron-ipc';
 
-export const registerDialogIpc = () => {
-  ipcHandle(showMessageChannel, async (event, options) => {
+export const dialogIpc = createIpcHandlers({
+  '/dialog/showMessageBox': async (event, options) => {
     const window = BrowserWindow.fromWebContents(event.sender) || undefined;
 
     if (window) {
@@ -11,5 +10,5 @@ export const registerDialogIpc = () => {
     }
 
     return dialog.showMessageBox(options);
-  });
-};
+  },
+});

@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-import { getTransfersChannel, addTransferChannel } from '@shared/ipc/transfers';
 import {
   SerializedTransfer,
   TransferInputDownload,
@@ -46,11 +45,11 @@ export const useTransfersStore = defineStore('transfers', {
 
   actions: {
     async getTransfers() {
-      this.transfers = await window.ipcInvoke(getTransfersChannel);
+      this.transfers = await window.ipcInvoke('/transfers/get');
     },
 
     async addTransfer(input: TransferInputUpload | TransferInputDownload) {
-      await window.ipcInvoke(addTransferChannel, input);
+      await window.ipcInvoke('/transfers/add', input);
     },
 
     updateTransfer(transfer: SerializedTransfer) {

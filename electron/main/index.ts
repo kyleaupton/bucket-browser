@@ -3,33 +3,8 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import os from 'node:os';
 
-// import db from '@main/db';
-// import { PersistedConnection } from '@shared/types/connections';
-import { registerIpcChannels } from '@main/ipc';
 import { initializeConnections } from '@main/connections';
-
-// await db.update((data) => {
-//   const item: PersistedConnection = {
-//     id: 'test-server',
-//     nickname: 'cs-dev-edge-01.local.local.local',
-//     config: {
-//       region: 'us-east-1',
-//       endpoint: 'http://cs-dev-edge-01.local:7070',
-//       credentials: {
-//         accessKeyId: '7D3CB51EC5B30210CA46',
-//         secretAccessKey: 'd216c90f83ec554ee29c8b50eb0439be30459612',
-//       },
-//     },
-//   };
-
-//   const index = data.connections.findIndex((conn) => conn.id === item.id);
-
-//   if (index === -1) {
-//     data.connections.push(item);
-//   } else {
-//     data.connections[index] = item;
-//   }
-// });
+import '@main/ipc';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -109,7 +84,6 @@ async function createWindow() {
 
 app.on('ready', () => {
   initializeConnections();
-  registerIpcChannels();
   createWindow();
 });
 

@@ -1,21 +1,16 @@
-import { ipcHandle } from 'typed-electron-ipc';
+import { createIpcHandlers } from 'typed-electron-ipc';
 import { addTransfer, getTransfers } from '@main/transfers';
 import TransferDownload from '@main/transfers/TransferDownload';
 import TransferUpload from '@main/transfers/TransferUpload';
 import {
   isTransferInputDownload,
   isTransferInputUpload,
+  TransferInputDownload,
+  TransferInputUpload,
 } from '@shared/types/transfers';
-import {
-  getTransfersChannel,
-  addTransferChannel,
-  pauseTransferChannel,
-  resumeTransferChannel,
-  cancelTransferChannel,
-} from '@shared/ipc/transfers';
 
-export const registerTransfersIpc = () => {
-  ipcHandle(getTransfersChannel, async () => {
+export const transfersIpc = createIpcHandlers({
+  '/transfers/get': async () => {
     const transfers = getTransfers();
 
     return Object.fromEntries(
@@ -24,9 +19,12 @@ export const registerTransfersIpc = () => {
         transfer.serialize(),
       ]),
     );
-  });
+  },
 
-  ipcHandle(addTransferChannel, async (event, input) => {
+  '/transfers/add': async (
+    event,
+    input: TransferInputDownload | TransferInputUpload,
+  ) => {
     let transfer: TransferDownload | TransferUpload;
 
     if (isTransferInputDownload(input)) {
@@ -39,32 +37,32 @@ export const registerTransfersIpc = () => {
 
     addTransfer(transfer);
     return transfer.serialize();
-  });
+  },
 
-  ipcHandle(pauseTransferChannel, async (event, id) => {
+  '/transfers/pause': async (event, id: string) => {
     const transfer = getTransfers().get(id);
     if (!transfer) {
       throw new Error('Transfer not found');
     }
 
     transfer.pause();
-  });
+  },
 
-  ipcHandle(resumeTransferChannel, async (event, id) => {
+  '/transfers/resume': async (event, id: string) => {
     const transfer = getTransfers().get(id);
     if (!transfer) {
       throw new Error('Transfer not found');
     }
 
     transfer.resume();
-  });
+  },
 
-  ipcHandle(cancelTransferChannel, async (event, id) => {
+  '/transfers/cancel': async (event, id: string) => {
     const transfer = getTransfers().get(id);
     if (!transfer) {
       throw new Error('Transfer not found');
     }
 
     transfer.cancel();
-  });
-};
+  },
+});

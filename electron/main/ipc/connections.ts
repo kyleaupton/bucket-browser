@@ -1,13 +1,5 @@
 import keytar from 'keytar';
-import { ipcHandle, throwIpcError } from 'typed-electron-ipc';
-import {
-  getConnectionsChannel,
-  addConnectionChannel,
-  editConnectionChannel,
-  removeConnectionChannel,
-  listBucketsChannel,
-  listObjectsChannel,
-} from '@shared/ipc/connections';
+import { createIpcHandlers } from 'typed-electron-ipc';
 import Connection from '@main/connections/Connection';
 import {
   getConnection,
@@ -16,14 +8,15 @@ import {
   removeConnection,
 } from '@main/connections';
 import db from '@main/db';
-import { PersistedConnection } from '@shared/types/connections';
+import { PersistedConnection, NewConnection } from '@shared/types/connections';
+import { ListObjectsCommandInput } from '@aws-sdk/client-s3';
 
-export const registerConnectionsIpc = () => {
-  ipcHandle(getConnectionsChannel, async () => {
+export const connectionsIpc = createIpcHandlers({
+  '/connections/get': async () => {
     return getConnections();
-  });
+  },
 
-  ipcHandle(addConnectionChannel, async (event, connection) => {
+  '/connections/add': async (event, connection: NewConnection) => {
     await keytar.setPassword(
       'bucket-browser',
       connection.id,
@@ -48,9 +41,9 @@ export const registerConnectionsIpc = () => {
         data.connections.push(persisted);
       }
     });
-  });
+  },
 
-  ipcHandle(editConnectionChannel, async (event, connection) => {
+  '/connections/edit': async (event, connection: NewConnection) => {
     // TODO: Edit in a way that doesn't just remove/add a new connection
     await keytar.setPassword(
       'bucket-browser',
@@ -71,9 +64,9 @@ export const registerConnectionsIpc = () => {
         data.connections[index] = connection;
       }
     });
-  });
+  },
 
-  ipcHandle(removeConnectionChannel, async (event, connectionId) => {
+  '/connections/remove': async (event, connectionId: string) => {
     await keytar.deletePassword('bucket-browser', connectionId);
 
     removeConnection(connectionId);
@@ -83,23 +76,27 @@ export const registerConnectionsIpc = () => {
         (conn) => conn.id !== connectionId,
       );
     });
-  });
+  },
 
-  ipcHandle(listBucketsChannel, async (event, connectionId) => {
+  '/connections/list-buckets': async (event, connectionId: string) => {
     const connection = getConnection(connectionId);
     if (!connection) {
-      return throwIpcError('Connection not found');
+      throw new Error('Connection not found');
     }
 
     return connection.listBuckets();
-  });
+  },
 
-  ipcHandle(listObjectsChannel, async (event, connectionId, input) => {
+  '/connections/list-objects': async (
+    event,
+    connectionId: string,
+    input: ListObjectsCommandInput,
+  ) => {
     const connection = getConnection(connectionId);
     if (!connection) {
-      return throwIpcError('Connection not found');
+      throw new Error('Connection not found');
     }
 
     return connection.listObjects(input);
-  });
-};
+  },
+});

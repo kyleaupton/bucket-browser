@@ -1,14 +1,10 @@
 import { ipcRenderer, contextBridge } from 'electron';
-import { ipcInvoke, IpcChannel } from 'typed-electron-ipc';
+import { createIpcClient } from 'typed-electron-ipc';
 import { SerializedTransfer } from '@shared/types/transfers';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const _ipcInvoke = async <P extends any[], R>(
-  channel: IpcChannel<P, R>,
-  ...args: P
-): Promise<R> => {
-  return ipcInvoke(channel, ...args);
-};
+import { Router } from '@main/ipc';
+
+export const ipcInvoke = createIpcClient<Router>();
 
 export const onTransferUpdate = (
   callback: (transfer: SerializedTransfer) => void, // eslint-disable-line
@@ -24,6 +20,6 @@ export const onTransferRemove = (
   );
 };
 
-contextBridge.exposeInMainWorld('ipcInvoke', _ipcInvoke);
+contextBridge.exposeInMainWorld('ipcInvoke', ipcInvoke);
 contextBridge.exposeInMainWorld('onTransferUpdate', onTransferUpdate);
 contextBridge.exposeInMainWorld('onTransferRemove', onTransferRemove);

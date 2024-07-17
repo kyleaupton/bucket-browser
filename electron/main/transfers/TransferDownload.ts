@@ -97,6 +97,10 @@ export default class TransferDownload implements Transfer {
   }
 
   private async initialize() {
+    if (!this.connection.client) {
+      throw new Error('Connection client not initialized');
+    }
+
     this.status = 'initializing';
     this.sendUpdate();
 

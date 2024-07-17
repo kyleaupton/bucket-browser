@@ -41,7 +41,6 @@
 import { storeToRefs } from 'pinia';
 import prettyBytes from 'pretty-bytes';
 import Button from 'primevue/button';
-import { addTransferChannel } from '@shared/ipc/transfers';
 import { useBrowserStore, useLayoutStore } from '@/stores';
 import { getExtension } from '@/utils';
 import { Item } from './utils';
@@ -92,7 +91,7 @@ const toggleMenu = (event: MouseEvent, item: Item) => {
         const connection = layoutStore.selectedConnection;
 
         if (connection && item.type === 'object' && bucket) {
-          await window.ipcInvoke(addTransferChannel, {
+          await window.ipcInvoke('/transfers/add', {
             connectionId: connection.id,
             downloadPath: `/Users/kyleupton/Downloads/${item.name}`,
             clientOptions: {

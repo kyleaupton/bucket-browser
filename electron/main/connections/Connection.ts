@@ -1,6 +1,5 @@
 import { BrowserWindow } from 'electron';
 import keytar from 'keytar';
-import { throwIpcError } from 'typed-electron-ipc';
 import {
   S3Client,
   ListBucketsCommand,
@@ -55,7 +54,7 @@ export default class Connection {
 
   async listBuckets() {
     if (!this.client) {
-      return throwIpcError('S3 Client not initialized');
+      throw new Error('S3 Client not initialized');
     }
 
     return this.client.send(new ListBucketsCommand());
@@ -63,7 +62,7 @@ export default class Connection {
 
   async listObjects(input: ListObjectsCommandInput) {
     if (!this.client) {
-      return throwIpcError('S3 Client not initialized');
+      throw new Error('S3 Client not initialized');
     }
 
     return this.client.send(new ListObjectsCommand(input));

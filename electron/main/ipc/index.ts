@@ -1,11 +1,14 @@
-import { registerAppIpc } from './app';
-import { registerConnectionsIpc } from './connections';
-import { registerDialogIpc } from './dialog';
-import { registerTransfersIpc } from './transfers';
+import { ipcRouter } from 'typed-electron-ipc';
+import { appIpc } from './app';
+import { connectionsIpc } from './connections';
+import { dialogIpc } from './dialog';
+import { transfersIpc } from './transfers';
 
-export const registerIpcChannels = () => {
-  registerAppIpc();
-  registerConnectionsIpc();
-  registerDialogIpc();
-  registerTransfersIpc();
-};
+const router = ipcRouter({
+  ...appIpc,
+  ...connectionsIpc,
+  ...dialogIpc,
+  ...transfersIpc,
+});
+
+export type Router = typeof router;
