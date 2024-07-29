@@ -53,6 +53,9 @@ export default class Connection {
   }
 
   async listBuckets() {
+    // testing
+    // throw new Error('test error');
+
     if (!this.client) {
       throw new Error('S3 Client not initialized');
     }

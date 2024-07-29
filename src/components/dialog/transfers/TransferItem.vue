@@ -64,6 +64,7 @@ import { computed } from 'vue';
 import prettyBytes, { Options } from 'pretty-bytes';
 import Button from 'primevue/button';
 import { SerializedTransfer } from '@shared/types/transfers';
+import { ipcInvoke } from '@/ipc';
 import { useLayoutStore } from '@/stores';
 import { getExtension } from '@/utils';
 
@@ -123,9 +124,9 @@ const _prettyBytes = (size: number, options?: Options) => {
   return prettyBytes(size, _opts);
 };
 
-const pause = () => window.ipcInvoke('/transfers/pause', props.item.id);
-const resume = () => window.ipcInvoke('/transfers/resume', props.item.id);
-const cancel = () => window.ipcInvoke('/transfers/cancel', props.item.id);
+const pause = () => ipcInvoke('/transfers/pause', props.item.id);
+const resume = () => ipcInvoke('/transfers/resume', props.item.id);
+const cancel = () => ipcInvoke('/transfers/cancel', props.item.id);
 </script>
 
 <style scoped>

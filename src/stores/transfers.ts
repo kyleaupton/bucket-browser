@@ -4,6 +4,7 @@ import {
   TransferInputDownload,
   TransferInputUpload,
 } from '@shared/types/transfers';
+import { ipcInvoke } from '@/ipc';
 import { useLayoutStore } from '.';
 
 type State = {
@@ -45,11 +46,11 @@ export const useTransfersStore = defineStore('transfers', {
 
   actions: {
     async getTransfers() {
-      this.transfers = await window.ipcInvoke('/transfers/get');
+      this.transfers = await ipcInvoke('/transfers/get');
     },
 
     async addTransfer(input: TransferInputUpload | TransferInputDownload) {
-      await window.ipcInvoke('/transfers/add', input);
+      await ipcInvoke('/transfers/add', input);
     },
 
     updateTransfer(transfer: SerializedTransfer) {

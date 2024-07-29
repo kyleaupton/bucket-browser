@@ -1,12 +1,13 @@
-import { StyleValue } from 'vue';
+import { CSSProperties } from 'vue';
 import { defineStore, storeToRefs } from 'pinia';
+import { ipcInvoke } from '@/ipc';
 import { Item } from '@/components/browser/utils';
 import { useLayoutStore } from './layout';
 
 export interface Column {
   key: string;
   title: string;
-  style: StyleValue;
+  style: CSSProperties;
   sortable: boolean;
 }
 
@@ -35,20 +36,38 @@ export const useBrowserStore = defineStore('browser', {
       {
         key: 'icon',
         title: '',
-        style: 'width: 32px; flex-shrink: 0; box-sizing: content-box;',
+        style: {
+          width: '32px',
+          flexShrink: 0,
+          boxSizing: 'content-box',
+        },
         sortable: false,
       },
-      { key: 'name', title: 'Name', style: 'flex-grow: 1', sortable: true },
+      {
+        key: 'name',
+        title: 'Name',
+        style: {
+          flexGrow: 1,
+        },
+        sortable: true,
+      },
       {
         key: 'size',
         title: 'Size',
-        style: 'width: 62px; flex-shrink: 0; box-sizing: content-box;',
+        style: {
+          width: '62px',
+          flexShrink: 0,
+          boxSizing: 'content-box',
+        },
         sortable: true,
       },
       {
         key: 'more',
         title: '',
-        style: 'width: 62px; flex-shrink: 0',
+        style: {
+          width: '62px',
+          flexShrink: 0,
+        },
         sortable: false,
       },
     ],
@@ -125,12 +144,14 @@ export const useBrowserStore = defineStore('browser', {
           }, 500);
 
           if (!selectedBucket.value) {
-            const { Buckets } = await window.ipcInvoke(
+            const res = await ipcInvoke(
               '/connections/list-buckets',
               selectedConnection.value.id,
             );
 
-            for (const bucket of Buckets || []) {
+            console.log(res);
+
+            for (const bucket of res.Buckets || []) {
               if (bucket.Name) {
                 payload.push({
                   type: 'bucket',
@@ -141,7 +162,7 @@ export const useBrowserStore = defineStore('browser', {
               }
             }
           } else {
-            const res = await window.ipcInvoke(
+            const res = await ipcInvoke(
               '/connections/list-objects',
               selectedConnection.value.id,
               {
@@ -194,7 +215,8 @@ export const useBrowserStore = defineStore('browser', {
         }
       } catch (e) {
         if (e instanceof Error) {
-          console.log('got this error inside renderer', e);
+          console.log('got this error inside renderer');
+          console.log({ ...e });
         }
       }
     },

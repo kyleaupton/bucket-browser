@@ -24,6 +24,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { ipcInvoke } from '@/ipc';
 import { useConnectionsStore, useLayoutStore } from '@/stores';
 import { SerializedConnection } from '@shared/types/connections';
 
@@ -59,7 +60,7 @@ const toggleMenu = (event: MouseEvent) => {
       label: 'Delete',
       icon: 'pi pi-trash',
       command: async () => {
-        const { response } = await window.ipcInvoke('/dialog/showMessageBox', {
+        const { response } = await ipcInvoke('/dialog/showMessageBox', {
           message: 'Are you sure you want do delete this connection?',
           type: 'question',
           buttons: ['Yes', 'Cancel'],

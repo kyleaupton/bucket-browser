@@ -1,5 +1,6 @@
 import { VNodeRef } from 'vue';
 import { defineStore } from 'pinia';
+import { ipcInvoke } from '@/ipc';
 import { SerializedConnection } from '@shared/types/connections';
 import { getExtension } from '@/utils';
 import { useBrowserStore, useTransfersStore } from '.';
@@ -78,7 +79,7 @@ export const useLayoutStore = defineStore('layout', {
 
   actions: {
     async getOs() {
-      this.os = await window.ipcInvoke('/app/getOsChannel');
+      this.os = await ipcInvoke('/app/getOsChannel');
     },
 
     setDialog(dialog: Dialog) {
@@ -91,9 +92,9 @@ export const useLayoutStore = defineStore('layout', {
 
     async getStandardIcons() {
       const res = await Promise.all([
-        window.ipcInvoke('/app/getBucketImage'),
-        window.ipcInvoke('/app/getFolderImage'),
-        window.ipcInvoke('/app/getObjectImage', 'foo'),
+        ipcInvoke('/app/getBucketImage'),
+        ipcInvoke('/app/getFolderImage'),
+        ipcInvoke('/app/getObjectImage', 'foo'),
       ]);
 
       this.bucketIcon = res[0];
@@ -108,7 +109,7 @@ export const useLayoutStore = defineStore('layout', {
           return;
         }
 
-        this.fileIcons[ext] = await window.ipcInvoke(
+        this.fileIcons[ext] = await ipcInvoke(
           '/app/getObjectImage',
           `foo.${ext}`,
         );

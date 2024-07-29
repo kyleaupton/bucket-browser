@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { ipcInvoke } from '@/ipc';
 import { SerializedConnection, NewConnection } from '@shared/types/connections';
 
 type State = {
@@ -14,7 +15,7 @@ export const useConnectionsStore = defineStore('connections', {
 
   actions: {
     async getConnections() {
-      this.connections = await window.ipcInvoke('/connections/get');
+      this.connections = await ipcInvoke('/connections/get');
     },
 
     selectConnection(connectionId: string) {
@@ -22,23 +23,17 @@ export const useConnectionsStore = defineStore('connections', {
     },
 
     async addConnection(connection: NewConnection) {
-      await window.ipcInvoke(
-        '/connections/add',
-        ...window.serialize(connection),
-      );
+      await ipcInvoke('/connections/add', ...window.serialize(connection));
       await this.getConnections();
     },
 
     async editConnection(connection: NewConnection) {
-      await window.ipcInvoke(
-        '/connections/edit',
-        ...window.serialize(connection),
-      );
+      await ipcInvoke('/connections/edit', ...window.serialize(connection));
       await this.getConnections();
     },
 
     async removeConnection(connectionId: string) {
-      await window.ipcInvoke('/connections/remove', connectionId);
+      await ipcInvoke('/connections/remove', connectionId);
       await this.getConnections();
     },
   },
