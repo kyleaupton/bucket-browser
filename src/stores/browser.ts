@@ -22,7 +22,7 @@ type State = {
     key: string;
     order: 'asc' | 'desc';
   };
-  error: string | undefined;
+  error: unknown;
 };
 
 export const useBrowserStore = defineStore('browser', {
@@ -214,10 +214,7 @@ export const useBrowserStore = defineStore('browser', {
           clearTimeout(timeout);
         }
       } catch (e) {
-        if (e instanceof Error) {
-          console.log('got this error inside renderer');
-          console.log({ ...e });
-        }
+        this.error = e;
       }
     },
 
