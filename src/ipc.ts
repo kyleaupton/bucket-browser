@@ -8,7 +8,7 @@ export const ipcInvoke = async <
   P extends ExcludeFirst<Parameters<Router[C]>>,
 >(
   channel: C,
-  ...args: P
+  ...args: NoInfer<P>
 ) => {
   const res = await window.ipcInvoke(channel, ...args);
 
