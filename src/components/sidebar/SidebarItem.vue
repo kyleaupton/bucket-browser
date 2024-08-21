@@ -2,8 +2,8 @@
   <div
     :key="connection.id"
     href="#"
-    class="flex items-center rounded-md text-sm h-8 px-3 cursor-pointer select-none font-medium transition-colors dark:text-white dark:hover:bg-muted dark:hover:text-white"
-    :class="{ 'dark:bg-muted': selected }"
+    class="flex items-center rounded-md text-sm h-8 px-3 cursor-pointer select-none font-medium transition-colors hover:bg-muted/60"
+    :class="{ '!bg-muted': selected }"
     @click="selectConnection"
   >
     <Cloud class="mr-2 size-4 flex-shrink-0" />

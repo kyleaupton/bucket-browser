@@ -38,5 +38,6 @@ window.serialize = serialize;
   flex-direction: column;
   height: 100vh;
   width: 100vw;
+  /* @apply border; */
 }
 </style>

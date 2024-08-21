@@ -1,16 +1,16 @@
 <template>
   <div
-    class="flex items-center overflow-hidden select-none dark:hover:bg-neutral-800 cursor-pointer"
+    class="flex items-center overflow-hidden select-none transition-colors cursor-pointer border-b hover:bg-muted/60"
     @click.self="handleNavigation(item)"
   >
     <!-- Img -->
-    <div class="p-4" :style="columns[0].style" @click="handleNavigation(item)">
+    <div class="p-3" :style="columns[0].style" @click="handleNavigation(item)">
       <img class="h-[32px] w-[32px]" :src="getItemIcon(item)" />
     </div>
 
     <!-- Name -->
     <div
-      class="p-4 truncate"
+      class="p-3 truncate text-sm font-medium"
       :style="columns[1].style"
       @click="handleNavigation(item)"
     >
@@ -18,7 +18,11 @@
     </div>
 
     <!-- Size -->
-    <div class="p-4" :style="columns[2].style" @click="handleNavigation(item)">
+    <div
+      class="p-3 text-sm"
+      :style="columns[2].style"
+      @click="handleNavigation(item)"
+    >
       <div v-if="item.type === 'object' && item.size != null">
         {{ prettyBytes(item.size) }}
       </div>
@@ -28,11 +32,13 @@
     <!-- More -->
     <div class="flex justify-center pr-4" :style="columns[3].style">
       <Button
-        icon="pi pi-ellipsis-h"
-        severity="secondary"
-        size="small"
+        class="h-8 w-8"
+        variant="ghost"
+        size="icon"
         @click="(e) => toggleMenu(e, item)"
-      />
+      >
+        <Ellipsis class="size-4" />
+      </Button>
     </div>
   </div>
 </template>
@@ -40,7 +46,8 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import prettyBytes from 'pretty-bytes';
-import Button from 'primevue/button';
+import { Ellipsis } from 'lucide-vue-next';
+import { Button } from '@/components/ui/button';
 import { ipcInvoke } from '@/ipc';
 import { useBrowserStore, useLayoutStore } from '@/stores';
 import { getExtension } from '@/utils';

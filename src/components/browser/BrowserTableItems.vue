@@ -5,7 +5,7 @@
       v-slot="{ item }"
       class="h-full w-full rounded-b-lg"
       :items="browserStore.itemsSorted"
-      :item-size="60"
+      :item-size="57"
       key-field="key"
     >
       <BrowserTableItem :item="item" />

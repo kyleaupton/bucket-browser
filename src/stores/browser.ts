@@ -173,7 +173,7 @@ export const useBrowserStore = defineStore('browser', {
               },
             );
 
-            // console.log(res);
+            console.log(res);
 
             if (res.IsTruncated && res.ContinuationToken) {
               this.pageMarkers.set(this.currentPage + 1, res.ContinuationToken);
