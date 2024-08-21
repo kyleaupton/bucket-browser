@@ -17,6 +17,9 @@ import {
 } from '@/stores';
 import { serialize } from './utils';
 
+// For now just force dark mode
+document.documentElement.classList.add('dark');
+
 const connectionsStore = useConnectionsStore();
 const layoutStore = useLayoutStore();
 const transfersStore = useTransfersStore();
@@ -35,6 +38,5 @@ window.serialize = serialize;
   flex-direction: column;
   height: 100vh;
   width: 100vw;
-  @apply bg-neutral-950;
 }
 </style>

@@ -1,29 +1,19 @@
 <template>
   <div
-    class="sidebar-item flex items-center justify-between gap-2 p-2 rounded-lg cursor-pointer select-none dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800"
-    :class="{
-      'sidebar-item-selected bg-neutral-200 dark:bg-neutral-800': selected,
-    }"
-    @click.self="selectConnection"
+    :key="connection.id"
+    href="#"
+    class="flex items-center rounded-md text-sm h-8 px-3 cursor-pointer select-none font-medium transition-colors dark:text-white dark:hover:bg-muted dark:hover:text-white"
+    :class="{ 'dark:bg-muted': selected }"
+    @click="selectConnection"
   >
-    <div class="flex gap-2 items-center overflow-hidden">
-      <i class="pi pi-cloud" style="font-size: 1.2rem"></i>
-      <p class="truncate" @click="selectConnection">
-        {{ props.connection.nickname }}
-      </p>
-    </div>
-
-    <div
-      class="sidebar-item-icon justify-center items-center p-[3px] rounded-lg"
-      @click="toggleMenu"
-    >
-      <i class="pi pi-ellipsis-h"></i>
-    </div>
+    <Cloud class="mr-2 size-4 flex-shrink-0" />
+    <div class="truncate">{{ connection.nickname }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { Cloud } from 'lucide-vue-next';
 import { ipcInvoke } from '@/ipc';
 import { useConnectionsStore, useLayoutStore } from '@/stores';
 import { SerializedConnection } from '@shared/types/connections';

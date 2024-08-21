@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full rounded-lg dark:bg-neutral-900">
+  <div class="h-full rounded-lg">
     <!-- No connection selected -->
     <div
       v-if="!selectedConnection"

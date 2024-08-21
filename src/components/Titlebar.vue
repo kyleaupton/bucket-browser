@@ -1,62 +1,82 @@
 <template>
   <div
-    class="titlebar-drag relative h-12 shrink-0 flex justify-between p-2 dark:bg-neutral-900"
+    class="titlebar-drag relative h-12 shrink-0 flex justify-center items-center border-b bg-[--background]"
   >
     <div
       class="absolute flex gap-2 h-12 p-2 -m-2"
       :class="{ 'left-[74px]': macosTitlebar }"
     >
       <Button
-        class="titlebar-nodrag"
-        icon="pi pi-bars"
-        severity="secondary"
-        size="small"
+        class="titlebar-nodrag h-8 w-8"
+        variant="ghost"
+        size="icon"
         @click="toggleSidebar"
-      />
+      >
+        <Menu class="size-4" />
+      </Button>
     </div>
 
-    <div class="mx-auto flex gap-2 w-1/2 max-w-screen-md">
+    <div class="flex gap-2 w-1/2">
       <Button
-        class="titlebar-nodrag"
-        icon="pi pi-arrow-left"
-        severity="secondary"
-        size="small"
+        class="titlebar-nodrag h-8 w-8 flex-shrink-0"
+        variant="ghost"
+        size="icon"
         @click="goBack"
-      />
+      >
+        <ArrowLeft class="size-4" />
+      </Button>
       <Button
-        class="titlebar-nodrag"
-        icon="pi pi-arrow-right"
-        severity="secondary"
-        size="small"
+        class="titlebar-nodrag h-8 w-8 flex-shrink-0"
+        variant="ghost"
+        size="icon"
         @click="goBack"
-      />
-      <Select
-        v-model="selected"
-        class="titlebar-nodrag titlebar-select w-full"
-        size="small"
-        :options="selectItems"
-        option-label="name"
-        variant="filled"
-        checkmark
-      />
+      >
+        <ArrowRight class="size-4" />
+      </Button>
+      <!-- <Select v-model="selected.code">
+        <SelectTrigger class="titlebar-nodrag h-8">
+          <SelectValue placeholder="Select a fruit" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectItem
+              v-for="item in selectItems"
+              :key="item.code"
+              :value="item.code"
+            >
+              {{ item.name }}
+            </SelectItem>
+          </SelectGroup>
+        </SelectContent>
+      </Select> -->
     </div>
 
     <div class="absolute flex gap-2 right-2 h-12 p-2 -m-2">
       <Button
-        class="titlebar-nodrag"
-        icon="pi pi-arrow-right-arrow-left"
-        severity="secondary"
-        size="small"
+        class="titlebar-nodrag h-8 w-8"
+        variant="ghost"
+        size="icon"
         @click="showTransfers"
-      />
+      >
+        <ArrowLeftRight class="size-4" />
+      </Button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import Button from 'primevue/button';
-import Select from 'primevue/select';
+import { Menu, ArrowLeft, ArrowRight, ArrowLeftRight } from 'lucide-vue-next';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useLayoutStore } from '@/stores';
 import { emitter } from '@/emitter';
 
