@@ -3,8 +3,8 @@ import keytar from 'keytar';
 import {
   S3Client,
   ListBucketsCommand,
-  ListObjectsCommand,
-  ListObjectsCommandInput,
+  ListObjectsV2Command,
+  ListObjectsV2CommandInput,
 } from '@aws-sdk/client-s3';
 import {
   SerializedConnection,
@@ -63,12 +63,12 @@ export default class Connection {
     return this.client.send(new ListBucketsCommand());
   }
 
-  async listObjects(input: ListObjectsCommandInput) {
+  async listObjects(input: ListObjectsV2CommandInput) {
     if (!this.client) {
       throw new Error('S3 Client not initialized');
     }
 
-    return this.client.send(new ListObjectsCommand(input));
+    return this.client.send(new ListObjectsV2Command(input));
   }
 
   serialize(): SerializedConnection {
