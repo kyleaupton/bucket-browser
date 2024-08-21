@@ -33,22 +33,24 @@
       >
         <ArrowRight class="size-4" />
       </Button>
-      <!-- <Select v-model="selected.code">
-        <SelectTrigger class="titlebar-nodrag h-8">
-          <SelectValue placeholder="Select a fruit" />
+      <Select v-model="selected" :disabled="!selected">
+        <SelectTrigger
+          class="titlebar-nodrag h-8 disabled:opacity-100 disabled:cursor-default"
+        >
+          <SelectValue placeholder="" />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
             <SelectItem
               v-for="item in selectItems"
-              :key="item.code"
-              :value="item.code"
+              :key="item.path"
+              :value="item.path"
             >
-              {{ item.name }}
+              {{ item.label }}
             </SelectItem>
           </SelectGroup>
         </SelectContent>
-      </Select> -->
+      </Select>
     </div>
 
     <div class="absolute flex gap-2 right-2 h-12 p-2 -m-2">
@@ -73,7 +75,6 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
@@ -93,14 +94,24 @@ const getItemPath = (itemName: string) => {
     .join('/');
 };
 
-const selectItems = computed(() => {
-  const payload = [
-    {
-      type: 'connection',
-      name: layoutStore.selectedConnection?.nickname || '',
-      code: layoutStore.selectedConnection?.nickname || '',
-    },
-  ];
+interface SelectableItems {
+  type: string;
+  label: string;
+  path: string;
+}
+
+const selectItems = computed((): SelectableItems[] => {
+  const payload: SelectableItems[] = [];
+
+  if (!layoutStore.selectedConnection) {
+    return payload;
+  }
+
+  payload.push({
+    type: 'connection',
+    label: layoutStore.selectedConnection.nickname,
+    path: '<current_connection>',
+  });
 
   payload.push(
     ...layoutStore.path
@@ -108,36 +119,30 @@ const selectItems = computed(() => {
       .slice(1)
       .map((item) => ({
         type: 'bucket/object',
-        name: item,
-        code: getItemPath(item),
+        label: item,
+        path: getItemPath(item),
       })),
   );
 
   return payload;
 });
 
-const selected = computed({
+const selected = computed<string>({
   get: () => {
-    if (!layoutStore.path) {
-      return {
-        name: layoutStore.selectedConnection?.nickname || '',
-        code: layoutStore.selectedConnection?.nickname || '',
-        type: 'connection',
-      };
+    if (!layoutStore.selectedConnection) {
+      return '';
+    } else if (!layoutStore.path) {
+      return '<current_connection>';
     }
 
     const name = layoutStore.path.split('/').slice(-1)[0];
-    return {
-      name: name,
-      code: getItemPath(name),
-      type: 'bucket/object',
-    };
+    return getItemPath(name);
   },
-  set: (item: { code: string; name: string; type: string }) => {
-    if (item.type === 'connection') {
+  set: (path: string) => {
+    if (path === '<current_connection>') {
       layoutStore.path = '';
     } else {
-      layoutStore.path = item.code;
+      layoutStore.path = path;
     }
   },
 });

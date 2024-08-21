@@ -15,7 +15,12 @@
       >
         <Sidebar />
       </ResizablePanel>
-      <ResizableHandle id="splitter-resize-handle-1" with-handle />
+      <ResizableHandle
+        id="splitter-resize-handle-1"
+        class="transition-colors"
+        :class="{ 'bg-transparent': isCollapsed }"
+        with-handle
+      />
       <ResizablePanel id="splitter-panel-2" :size="65" :min-size="65">
         <Browser />
       </ResizablePanel>
