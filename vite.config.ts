@@ -4,6 +4,8 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import alias from '@rollup/plugin-alias';
 import electron from 'vite-plugin-electron/simple';
+import tailwind from 'tailwindcss';
+import autoprefixer from 'autoprefixer';
 import pkg from './package.json';
 
 const _alias = alias({
@@ -32,6 +34,11 @@ export default defineConfig(({ command }) => {
   const sourcemap = isServe || !!process.env.VSCODE_DEBUG;
 
   return {
+    css: {
+      postcss: {
+        plugins: [tailwind(), autoprefixer()],
+      },
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),

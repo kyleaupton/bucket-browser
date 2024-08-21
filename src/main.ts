@@ -8,7 +8,7 @@ import App from './App.vue';
 import 'primeicons/primeicons.css';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 
-import './style.css';
+import './assets/index.css';
 
 createApp(App)
   .use(createPinia())
