@@ -55,7 +55,7 @@ import prettyBytes from 'pretty-bytes';
 import { Ellipsis, Download, FolderOpen } from 'lucide-vue-next';
 import { createContextMenu } from '@/contextMenu';
 import { Button } from '@/components/ui/button';
-// import { ipcInvoke } from '@/ipc';
+import { ipcInvoke } from '@/ipc';
 import { useBrowserStore, useLayoutStore } from '@/stores';
 import { getExtension } from '@/utils';
 import { Item } from './utils';
@@ -106,8 +106,23 @@ const contextItemsObject = [
         h(Download, { class: 'mr-2 h-4 w-4' }),
         h('div', 'Download'),
       ]),
-    command: () => {
-      console.log('got herere');
+    command: async () => {
+      const path = layoutStore.path;
+      const bucket = path.split('/')[1];
+      const connection = layoutStore.selectedConnection;
+
+      if (connection && props.item.type === 'object' && bucket) {
+        await ipcInvoke('/transfers/add', {
+          connectionId: connection.id,
+          downloadPath: `/Users/kyleupton/Downloads/${props.item.name}`,
+          clientOptions: {
+            Bucket: bucket,
+            Key: props.item.key,
+          },
+        });
+
+        layoutStore.setDialog({ name: 'transfers' });
+      }
     },
   },
 ];
