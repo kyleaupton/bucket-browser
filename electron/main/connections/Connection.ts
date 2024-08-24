@@ -25,7 +25,6 @@ export default class Connection {
   error: string | undefined;
 
   constructor(connection: PersistedConnection) {
-    console.log('constructor', connection);
     this.id = connection.id;
     this.nickname = connection.nickname;
     this.accessKeyId = connection.accessKeyId;
@@ -53,9 +52,6 @@ export default class Connection {
   }
 
   async listBuckets() {
-    // testing
-    // throw new Error('test error');
-
     if (!this.client) {
       throw new Error('S3 Client not initialized');
     }

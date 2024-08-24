@@ -169,14 +169,17 @@ export const useBrowserStore = defineStore('browser', {
                 Bucket: selectedBucket.value,
                 Prefix: selectedObject.value ? `${selectedObject.value}/` : '',
                 Delimiter: '/',
-                Marker: this.pageMarkers.get(this.currentPage),
+                ContinuationToken: this.pageMarkers.get(this.currentPage),
               },
             );
 
             console.log(res);
 
-            if (res.IsTruncated && res.ContinuationToken) {
-              this.pageMarkers.set(this.currentPage + 1, res.ContinuationToken);
+            if (res.IsTruncated && res.NextContinuationToken) {
+              this.pageMarkers.set(
+                this.currentPage + 1,
+                res.NextContinuationToken,
+              );
             }
 
             for (const item of res.CommonPrefixes || []) {

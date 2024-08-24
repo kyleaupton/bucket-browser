@@ -9,7 +9,7 @@ import {
 } from '@main/connections';
 import db from '@main/db';
 import { PersistedConnection, NewConnection } from '@shared/types/connections';
-import { ListObjectsCommandInput } from '@aws-sdk/client-s3';
+import { ListObjectsV2CommandInput } from '@aws-sdk/client-s3';
 
 export const connectionsIpc = createIpcHandlers({
   '/connections/get': async () => {
@@ -90,7 +90,7 @@ export const connectionsIpc = createIpcHandlers({
   '/connections/list-objects': async (
     event,
     connectionId: string,
-    input: ListObjectsCommandInput,
+    input: ListObjectsV2CommandInput,
   ) => {
     const connection = getConnection(connectionId);
     if (!connection) {
