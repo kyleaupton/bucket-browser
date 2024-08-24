@@ -1,88 +1,132 @@
 <template>
-  <Dialog
-    v-model:visible="visible"
-    modal
-    :header="title"
-    :style="{ width: '25rem' }"
-  >
-    <div class="flex items-center gap-4 mb-4">
-      <label for="name" class="font-semibold w-24">Name</label>
-      <InputText
-        id="name"
-        v-model="persistedConnection.nickname"
-        class="flex-auto"
-        size="small"
-      />
-    </div>
+  <Dialog v-model:open="visible">
+    <DialogContent class="connection-dialog overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle>{{ title }}</DialogTitle>
+        <DialogDescription>{{ description }}</DialogDescription>
+      </DialogHeader>
 
-    <div class="flex items-center gap-4 mb-4">
-      <label for="endpoint" class="font-semibold w-24">Endpoint</label>
-      <InputText
-        id="endpoint"
-        v-model="persistedConnection.config.endpoint"
-        class="flex-auto"
-        size="small"
-      />
-    </div>
+      <form class="flex flex-col gap-3" @submit="onSubmit">
+        <FormField v-slot="{ componentField }" name="nickname">
+          <FormItem>
+            <FormLabel>Connection Name</FormLabel>
+            <FormControl>
+              <Input type="text" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
 
-    <div class="flex items-center gap-4 mb-4">
-      <label for="access-key" class="font-semibold w-24">Access Key</label>
-      <InputText
-        id="access-key"
-        v-model="persistedConnection.accessKeyId"
-        class="flex-auto"
-        size="small"
-      />
-    </div>
+        <FormField v-slot="{ componentField }" name="accessKeyId">
+          <FormItem>
+            <FormLabel>Accses Key</FormLabel>
+            <FormControl>
+              <Input type="text" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
 
-    <div class="flex items-center gap-4 mb-4">
-      <label for="secret-key" class="font-semibold w-24 shrink-0"
-        >Secret Key</label
-      >
-      <Password
-        id="secret-key"
-        v-model="persistedConnection.secretAccessKey"
-        :feedback="false"
-        size="small"
-        toggle-mask
-      />
-    </div>
+        <FormField v-slot="{ componentField }" name="secretAccessKey">
+          <FormItem>
+            <FormLabel>Secret Key</FormLabel>
+            <FormControl>
+              <Input type="password" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
 
-    <div class="flex items-center gap-4 mb-4">
-      <label for="path-style" class="font-semibold">Force Path Style</label>
-      <ToggleSwitch
-        id="path-style"
-        v-model="persistedConnection.config.forcePathStyle"
-      />
-    </div>
+        <FormField v-slot="{ componentField }" name="config.endpoint">
+          <FormItem>
+            <FormLabel>Endpoint</FormLabel>
+            <FormControl>
+              <Input type="text" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+            <FormDescription>
+              The endpoint of the S3-compatible storage service. For AWS S3, the
+              default endpoint is <code>https://s3.amazonaws.com</code>.
+            </FormDescription>
+          </FormItem>
+        </FormField>
 
-    <div class="flex justify-end gap-2">
-      <Button
-        type="button"
-        label="Cancel"
-        severity="secondary"
-        @click="layoutStore.closeDialog()"
-      ></Button>
-      <Button
-        type="button"
-        label="Save"
-        severity="contrast"
-        :disabled="disabled"
-        @click="save"
-      ></Button>
-    </div>
+        <FormField v-slot="{ componentField }" name="config.region">
+          <FormItem>
+            <FormLabel>Region</FormLabel>
+            <FormControl>
+              <Input type="text" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+            <FormDescription
+              >Region of the AWS S3 service endpoint. For S3-compatible storage
+              services other than AWS, <code>us-east-1</code> will usually
+              work.</FormDescription
+            >
+          </FormItem>
+        </FormField>
+
+        <FormField
+          v-slot="{ value, handleChange }"
+          name="config.forcePathStyle"
+        >
+          <FormItem class="mt-2">
+            <div class="flex items-center gap-4">
+              <FormLabel>Force Path Style</FormLabel>
+              <FormControl>
+                <Switch
+                  class="!mt-0"
+                  :checked="value"
+                  @update:checked="handleChange"
+                />
+              </FormControl>
+            </div>
+            <FormDescription>
+              Force the use of path-style URLs. This is required for most S3
+              services that are not AWS.
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <DialogFooter class="mt-3">
+          <DialogClose as-child>
+            <Button type="button" variant="secondary">Cancel</Button>
+          </DialogClose>
+          <Button type="submit">Save</Button>
+        </DialogFooter>
+      </form>
+    </DialogContent>
   </Dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { nanoid } from 'nanoid';
-import Dialog from 'primevue/dialog';
-import InputText from 'primevue/inputtext';
-import ToggleSwitch from 'primevue/toggleswitch';
-import Button from 'primevue/button';
-import Password from 'primevue/password';
+import { useForm } from 'vee-validate';
+import { toTypedSchema } from '@vee-validate/zod';
+import * as z from 'zod';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog';
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { NewConnection } from '@shared/types/connections';
 import {
   useLayoutStore,
@@ -99,6 +143,9 @@ const isConnectionDialog = (dialog: t_Dialog): dialog is DialogConnection => {
   return dialog?.name === 'connection';
 };
 
+//
+// Computed
+//
 const visible = computed<boolean>({
   get: () => {
     return dialog.value !== undefined && isConnectionDialog(dialog.value);
@@ -116,67 +163,70 @@ const _dialog = computed(() => {
     | undefined;
 });
 
-const defaultConnection: NewConnection = {
-  id: nanoid(),
-  nickname: '',
-  accessKeyId: '',
-  secretAccessKey: '',
-  config: {
-    region: 'us-east-1',
-    endpoint: 'https://s3.amazonaws.com',
-  },
-};
-
-let persistedConnection = ref<NewConnection>(defaultConnection);
-
-watch(visible, () => {
-  if (_dialog?.value?.data) {
-    persistedConnection = ref<NewConnection>(
-      ...window.serialize({
-        ..._dialog.value.data,
-        secretAccessKey: _dialog.value.data.secretAccessKey || '',
-      }),
-    );
-  } else {
-    persistedConnection.value = defaultConnection;
-  }
-});
-
-const newConnection = computed(() => _dialog?.value?.data === undefined);
-
-const disabled = computed(() => {
-  return (
-    !persistedConnection.value.nickname ||
-    !persistedConnection.value.config.endpoint
-  );
-});
+const connection = computed(() => _dialog?.value?.data);
 
 const title = computed(() =>
-  newConnection.value ? 'New Connection' : 'Edit Connection',
+  connection.value ? 'Edit Connection' : 'New Connection',
 );
 
-const save = async () => {
-  if (newConnection.value) {
-    await connectionsStore.addConnection(persistedConnection.value);
+const description = computed(() =>
+  connection.value
+    ? 'Edit the connection to an S3-compatible storage service.'
+    : 'Create a new connection to an S3-compatible storage service.',
+);
+
+//
+// Form
+//
+const formSchema = toTypedSchema(
+  z.object({
+    id: z.string().default(nanoid),
+    nickname: z.string().min(1),
+    accessKeyId: z.string().min(1),
+    secretAccessKey: z.string().min(1),
+    config: z.object({
+      region: z.string().min(1).default('us-east-1'),
+      endpoint: z.string().min(1).default('https://s3.amazonaws.com'),
+      forcePathStyle: z.boolean().default(false),
+    }),
+  }),
+);
+
+const initialValues: NewConnection | undefined = connection.value
+  ? {
+      id: connection.value.id,
+      nickname: connection.value.nickname,
+      accessKeyId: connection.value.accessKeyId,
+      secretAccessKey: connection.value.secretAccessKey || '',
+      config: {
+        region: connection.value.config.region,
+        endpoint: connection.value.config.endpoint,
+        forcePathStyle: connection.value.config.forcePathStyle,
+      },
+    }
+  : undefined;
+
+const form = useForm({
+  validationSchema: formSchema,
+  initialValues,
+});
+
+//
+// Methods
+//
+const onSubmit = form.handleSubmit(async (values) => {
+  if (connection.value) {
+    await connectionsStore.editConnection(values);
   } else {
-    await connectionsStore.editConnection(persistedConnection.value);
+    await connectionsStore.addConnection(values);
   }
 
   layoutStore.closeDialog();
-};
+});
 </script>
 
 <style>
-#secret-key,
-#secret-key input {
-  width: 100%;
-}
-
-#secret-key input {
-  /* Because there's no small size for the password input */
-  padding-top: var(--p-inputtext-sm-padding-y);
-  padding-bottom: var(--p-inputtext-sm-padding-y);
-  padding-left: var(--p-inputtext-sm-padding-x);
-  font-size: var(--p-inputtext-sm-font-size);
+.connection-dialog {
+  max-height: calc(100vh - 2rem);
 }
 </style>

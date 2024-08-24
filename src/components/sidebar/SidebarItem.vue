@@ -23,7 +23,7 @@
       </div>
       <div ref="button" class="flex">
         <Button
-          class="w-6 h-6"
+          class="w-6 h-6 select-none"
           size="icon"
           variant="ghost"
           @click="toggleThreeDots"
