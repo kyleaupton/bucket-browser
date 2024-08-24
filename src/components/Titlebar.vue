@@ -8,7 +8,7 @@
     >
       <Button
         class="titlebar-nodrag h-8 w-8"
-        variant="ghost"
+        variant="outline"
         size="icon"
         @click="toggleSidebar"
       >
@@ -19,7 +19,7 @@
     <div class="flex gap-2 w-1/2">
       <Button
         class="titlebar-nodrag h-8 w-8 flex-shrink-0"
-        variant="ghost"
+        variant="outline"
         size="icon"
         @click="goBack"
       >
@@ -27,7 +27,7 @@
       </Button>
       <Button
         class="titlebar-nodrag h-8 w-8 flex-shrink-0"
-        variant="ghost"
+        variant="outline"
         size="icon"
         @click="goBack"
       >
@@ -56,7 +56,7 @@
     <div class="absolute flex gap-2 right-2 h-12 p-2 -m-2">
       <Button
         class="titlebar-nodrag h-8 w-8"
-        variant="ghost"
+        variant="outline"
         size="icon"
         @click="showTransfers"
       >

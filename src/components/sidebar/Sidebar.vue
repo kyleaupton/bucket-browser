@@ -5,6 +5,7 @@
         v-if="connectionsStore.connections.length"
         class="flex flex-col gap-1"
       >
+        <h2 class="px-3 text-lg font-semibold tracking-tight">Connections</h2>
         <SidebarItem
           v-for="con of connectionsStore.connections"
           :key="con.id"

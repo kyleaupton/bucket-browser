@@ -1,4 +1,3 @@
-import { VNodeRef } from 'vue';
 import { defineStore } from 'pinia';
 import { ipcInvoke } from '@/ipc';
 import { SerializedConnection } from '@shared/types/connections';
@@ -22,12 +21,6 @@ type State = {
   bucketIcon: string;
   defaultIcon: string;
   fileIcons: Record<string, string>;
-  contextMenu: VNodeRef | undefined;
-  contextMenuOptions: Array<{
-    label: string;
-    icon: string;
-    command: () => void;
-  }>;
 };
 
 export const useLayoutStore = defineStore('layout', {
@@ -40,8 +33,6 @@ export const useLayoutStore = defineStore('layout', {
     bucketIcon: '',
     defaultIcon: '',
     fileIcons: {},
-    contextMenu: undefined,
-    contextMenuOptions: [],
   }),
 
   getters: {

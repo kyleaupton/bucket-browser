@@ -2,19 +2,17 @@
   <Titlebar />
   <Main />
   <Dialog />
-  <ContextMenu />
 </template>
 
 <script setup lang="ts">
-import Titlebar from '@/components/Titlebar.vue';
-import Main from '@/views/Main.vue';
-import Dialog from '@/components/dialog/Dialog.vue';
-import ContextMenu from '@/components/ContextMenu.vue';
 import {
   useConnectionsStore,
   useLayoutStore,
   useTransfersStore,
 } from '@/stores';
+import Titlebar from '@/components/Titlebar.vue';
+import Main from '@/views/Main.vue';
+import Dialog from '@/components/dialog/Dialog.vue';
 import { serialize } from './utils';
 
 // For now just force dark mode
