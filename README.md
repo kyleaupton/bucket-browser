@@ -50,7 +50,7 @@ A desktop app to browse S3 buckets
 - [ ] UI
   - [ ] Finish light mode colors
   - [ ] Create surface css vars for consistant background colors
-  - [ ] Figure out how to properly theme `PrimeVue`
+  - [x] ~~Figure out how to properly theme `PrimeVue`~~ (Removed PrimeVue in favor of Shadcn)
   - [ ] Windows window controls
 - [ ] CI/CD
   - [ ] Get type checking hooked up
