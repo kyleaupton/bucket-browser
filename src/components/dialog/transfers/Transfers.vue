@@ -1,30 +1,39 @@
 <template>
-  <Dialog
-    v-model:visible="visible"
-    modal
-    header="Transfers"
-    :style="{ width: '80vw' }"
-  >
-    <div v-if="transfersArray.length" class="flex flex-col gap-2">
-      <TransferItem
-        v-for="item in transfersArray"
-        :key="item.id"
-        :item="item"
-      />
-    </div>
-    <div v-else>
-      <div class="flex justify-center items-center h-24">
-        <p>No transfers</p>
+  <Dialog v-model:open="visible">
+    <DialogContent class="transfers-dialog overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle>Transfers</DialogTitle>
+        <DialogDescription>View all transfers</DialogDescription>
+      </DialogHeader>
+
+      <div v-if="transfersArray.length" class="flex flex-col gap-2">
+        <TransferItem
+          v-for="item in transfersArray"
+          :key="item.id"
+          :item="item"
+        />
       </div>
-    </div>
+
+      <div v-else>
+        <div class="flex justify-center items-center h-24">
+          <p>No transfers</p>
+        </div>
+      </div>
+    </DialogContent>
   </Dialog>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import Dialog from 'primevue/dialog';
 import { useLayoutStore, useTransfersStore } from '@/stores';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import TransferItem from './TransferItem.vue';
 
 const layoutStore = useLayoutStore();
@@ -46,4 +55,8 @@ const visible = computed({
 const transfersArray = computed(() => Object.values(transfers.value));
 </script>
 
-<style scoped></style>
+<style scoped>
+.transfers-dialog {
+  max-height: calc(100vh - 2rem);
+}
+</style>

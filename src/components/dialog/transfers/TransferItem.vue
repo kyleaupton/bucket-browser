@@ -9,24 +9,30 @@
       <div class="flex gap-2">
         <Button
           v-if="item.status !== 'paused'"
-          icon="pi pi-pause"
-          severity="secondary"
-          size="small"
+          class="transfer-button"
+          size="icon"
+          variant="ghost"
           @click="pause"
-        />
+        >
+          <Pause class="transfer-icon" />
+        </Button>
         <Button
           v-else
-          icon="pi pi-play"
-          severity="secondary"
-          size="small"
+          class="transfer-button"
+          size="icon"
+          variant="ghost"
           @click="resume"
-        />
+        >
+          <Play class="transfer-icon" />
+        </Button>
         <Button
-          icon="pi pi-times"
-          severity="secondary"
-          size="small"
+          class="transfer-button"
+          size="icon"
+          variant="ghost"
           @click="cancel"
-        />
+        >
+          <X class="transfer-icon" />
+        </Button>
       </div>
     </div>
 
@@ -62,7 +68,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import prettyBytes, { Options } from 'pretty-bytes';
-import Button from 'primevue/button';
+import { Pause, Play, X } from 'lucide-vue-next';
+import { Button } from '@/components/ui/button';
 import { SerializedTransfer } from '@shared/types/transfers';
 import { ipcInvoke } from '@/ipc';
 import { useLayoutStore } from '@/stores';
@@ -136,5 +143,13 @@ const cancel = () => ipcInvoke('/transfers/cancel', props.item.id);
 
 .text-meta {
   @apply text-sm text-neutral-200;
+}
+
+.transfer-button {
+  @apply h-8 w-8;
+}
+
+.transfer-icon {
+  @apply size-5;
 }
 </style>

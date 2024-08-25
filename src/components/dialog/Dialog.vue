@@ -1,6 +1,6 @@
 <template>
   <Connection v-if="layoutStore.dialog?.name === 'connection'" />
-  <Transfers v-if="layoutStore.dialog?.name === 'transfers'" />
+  <Transfers v-else-if="layoutStore.dialog?.name === 'transfers'" />
 </template>
 
 <script setup lang="ts">
