@@ -1,17 +1,12 @@
-export type PersistedConnectionConfig = {
-  endpoint?: string;
-  region?: string;
-  forcePathStyle?: boolean;
+import { connections } from '@main/db';
+
+export type PersistedConnection = typeof connections.$inferSelect;
+export type NewConnection = Omit<typeof connections.$inferInsert, 'id'>;
+export type NewconnectionWithSecret = NewConnection & {
+  secretAccessKey: string;
 };
 
-export type PersistedConnection = {
-  nickname: string;
-  id: string;
-  config: PersistedConnectionConfig;
-  accessKeyId: string;
-};
-
-export type NewConnection = PersistedConnection & {
+export type Connection = PersistedConnection & {
   secretAccessKey: string;
 };
 

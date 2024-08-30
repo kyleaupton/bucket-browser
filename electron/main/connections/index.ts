@@ -1,10 +1,10 @@
-import db from '@main/db';
+import db, { connections as table_connections } from '@main/db';
 import Connection from './Connection';
 
-const connections = new Map<string, Connection>();
+const connections = new Map<number, Connection>();
 
-export const initializeConnections = () => {
-  const persisted = db.data.connections;
+export const initializeConnections = async () => {
+  const persisted = await db.select().from(table_connections);
   for (const connection of persisted) {
     const conn = new Connection(connection);
     connections.set(conn.id, conn);
@@ -18,7 +18,7 @@ export const getConnections = () => {
   );
 };
 
-export const getConnection = (id: string) => {
+export const getConnection = (id: number) => {
   return connections.get(id);
 };
 
@@ -26,6 +26,6 @@ export const addConnection = (connection: Connection) => {
   connections.set(connection.id, connection);
 };
 
-export const removeConnection = (id: string) => {
+export const removeConnection = (id: number) => {
   connections.delete(id);
 };

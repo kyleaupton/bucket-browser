@@ -9,38 +9,54 @@ import {
 import {
   SerializedConnection,
   PersistedConnection,
-  PersistedConnectionConfig,
 } from '@shared/types/connections';
 
 /**
  * S3 Connection class
  */
 export default class Connection {
-  id: string;
-  nickname: string;
+  // Meta
+  id: number;
+  name: string;
+  // Config
   accessKeyId: string;
   secretAccessKey: string | null;
-  config: PersistedConnectionConfig;
+  // Config
+  region: string;
+  endpoint: string;
+  forcePathStyle: boolean;
+  // State
   client: S3Client | undefined;
   error: string | undefined;
 
   constructor(connection: PersistedConnection) {
+    // Meta
     this.id = connection.id;
-    this.nickname = connection.nickname;
+    this.name = connection.name;
+    // Creds
     this.accessKeyId = connection.accessKeyId;
     this.secretAccessKey = null;
-    this.config = connection.config;
+    // Config
+    this.region = connection.region;
+    this.endpoint = connection.endpoint;
+    this.forcePathStyle = connection.forcePathStyle;
+    // State
     this.error = undefined;
   }
 
   async initialize() {
-    this.secretAccessKey = await keytar.getPassword('bucket-browser', this.id);
+    this.secretAccessKey = await keytar.getPassword(
+      'bucket-browser',
+      `${this.id}`,
+    );
 
     if (this.secretAccessKey == null) {
       this.error = 'Secret access key not found';
     } else {
       this.client = new S3Client({
-        ...this.config,
+        region: this.region,
+        endpoint: this.endpoint,
+        forcePathStyle: this.forcePathStyle,
         credentials: {
           accessKeyId: this.accessKeyId,
           secretAccessKey: this.secretAccessKey,
@@ -70,10 +86,12 @@ export default class Connection {
   serialize(): SerializedConnection {
     return {
       id: this.id,
-      nickname: this.nickname,
+      name: this.name,
       accessKeyId: this.accessKeyId,
       secretAccessKey: this.secretAccessKey,
-      config: this.config,
+      region: this.region,
+      endpoint: this.endpoint,
+      forcePathStyle: this.forcePathStyle,
       error: this.error,
     };
   }

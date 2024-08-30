@@ -1,5 +1,5 @@
-import keytar from 'keytar';
 import { createIpcHandlers } from 'typed-electron-ipc';
+import { eq } from 'drizzle-orm';
 import Connection from '@main/connections/Connection';
 import {
   getConnection,
@@ -7,8 +7,14 @@ import {
   addConnection,
   removeConnection,
 } from '@main/connections';
-import db from '@main/db';
-import { PersistedConnection, NewConnection } from '@shared/types/connections';
+import { getPassword, setPassword, deletePassword } from '@main/passwords';
+import db, { connections } from '@main/db';
+import {
+  PersistedConnection,
+  Connection,
+  NewConnection,
+  NewconnectionWithSecret,
+} from '@shared/types/connections';
 import { ListObjectsV2CommandInput } from '@aws-sdk/client-s3';
 
 export const connectionsIpc = createIpcHandlers({
@@ -16,40 +22,47 @@ export const connectionsIpc = createIpcHandlers({
     return getConnections();
   },
 
-  '/connections/add': async (event, connection: NewConnection) => {
-    await keytar.setPassword(
-      'bucket-browser',
-      connection.id,
-      connection.secretAccessKey,
-    );
+  '/connections/add': async (event, connection: NewconnectionWithSecret) => {
+    // Add the secret access key to the keychain
+    await setPassword(connection.name, connection.secretAccessKey);
 
-    const persisted: PersistedConnection = {
-      nickname: connection.nickname,
-      id: connection.id,
-      config: connection.config,
+    const newConnection: NewConnection = {
+      name: connection.name,
+      region: connection.region,
+      endpoint: connection.endpoint,
+      forcePathStyle: connection.forcePathStyle,
       accessKeyId: connection.accessKeyId,
     };
 
-    const conn = new Connection(persisted);
+    // Add the connection to the database
+    const { lastInsertRowid } = await db
+      .insert(connections)
+      .values(newConnection);
+
+    if (typeof lastInsertRowid !== 'number') {
+      throw new Error(
+        "Newly added connection ID is not a number, it's a bigint",
+      );
+    }
+
+    // Get the connection we just added
+    const persisted = await db
+      .select()
+      .from(connections)
+      .where(eq(connections.id, lastInsertRowid));
+
+    if (persisted.length !== 1) {
+      throw new Error('Duplicate connection ID');
+    }
+
+    const conn = new Connection(persisted[0]);
     await conn.initialize();
     addConnection(conn);
-
-    await db.update((data) => {
-      const index = data.connections.findIndex((c) => c.id === persisted.id);
-
-      if (index === -1) {
-        data.connections.push(persisted);
-      }
-    });
   },
 
-  '/connections/edit': async (event, connection: NewConnection) => {
+  '/connections/edit': async (event, connection: NewconnectionWithSecret) => {
     // TODO: Edit in a way that doesn't just remove/add a new connection
-    await keytar.setPassword(
-      'bucket-browser',
-      connection.id,
-      connection.secretAccessKey,
-    );
+    await setPassword(connection.name, connection.secretAccessKey);
 
     removeConnection(connection.id);
 
