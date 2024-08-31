@@ -84,15 +84,23 @@ export const useLayoutStore = defineStore('layout', {
     },
 
     async getStandardIcons() {
-      const res = await Promise.all([
-        ipcInvoke('/app/getBucketImage'),
-        ipcInvoke('/app/getFolderImage'),
-        ipcInvoke('/app/getObjectImage', 'foo'),
-      ]);
+      try {
+        this.bucketIcon = await ipcInvoke('/app/getBucketImage');
+      } catch (error) {
+        // Noop
+      }
 
-      this.bucketIcon = res[0];
-      this.folderIcon = res[1];
-      this.defaultIcon = res[2];
+      try {
+        this.folderIcon = await ipcInvoke('/app/getFolderImage');
+      } catch (error) {
+        // Noop
+      }
+
+      try {
+        this.defaultIcon = await ipcInvoke('/app/getObjectImage', 'foo.foo');
+      } catch (error) {
+        // Noop
+      }
     },
 
     async getFileIcons() {
