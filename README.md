@@ -2,7 +2,7 @@
 
 A desktop app to browse S3 buckets.
 
-<img src="https://raw.githubusercontent.com/kyleaupton/bucket-browser/main/docs/app.png" />
+<img src="https://raw.githubusercontent.com/kyleaupton/bucket-browser/main/docs/screenshot.png" />
 
 > [!NOTE]
 > This is still under active development. Check back soon for a v1 release!
