@@ -215,6 +215,6 @@ const onSubmit = form.handleSubmit(async (values) => {
 
 <style>
 .connection-dialog {
-  max-height: calc(100vh - 2rem);
+  max-height: calc(100vh - 4rem);
 }
 </style>
