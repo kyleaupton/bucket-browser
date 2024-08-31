@@ -40,6 +40,7 @@ export const useBrowserStore = defineStore('browser', {
           width: '32px',
           flexShrink: 0,
           boxSizing: 'content-box',
+          marginLeft: '0.75rem',
         },
         sortable: false,
       },
