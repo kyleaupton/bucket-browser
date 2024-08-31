@@ -16,10 +16,10 @@ import Main from '@/views/Main.vue';
 import Dialog from '@/components/dialog/Dialog.vue';
 import { serialize } from './utils';
 
-onMounted(async () => {
-  // For now just force dark mode
-  document.documentElement.classList.add('dark');
+// For now just force dark mode
+document.documentElement.classList.add('dark');
 
+onMounted(async () => {
   const connectionsStore = useConnectionsStore();
   const layoutStore = useLayoutStore();
   const transfersStore = useTransfersStore();
