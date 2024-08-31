@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, h, computed } from 'vue';
+import { ref, h, computed, VNode } from 'vue';
 import { storeToRefs } from 'pinia';
 import prettyBytes from 'pretty-bytes';
 import { Ellipsis, Download, FolderOpen } from 'lucide-vue-next';
@@ -93,7 +93,7 @@ const itemIcon = computed(() => {
   return layoutStore.defaultIcon;
 });
 
-const handleNavigation = () => {
+const handleNavigation = (): void => {
   if (props.item.type !== 'object') {
     layoutStore.path = `${layoutStore.path}/${props.item.name}`;
   }
@@ -101,12 +101,12 @@ const handleNavigation = () => {
 
 const contextItemsObject = [
   {
-    render: () =>
+    render: (): VNode =>
       h('div', { class: 'w-44' }, [
         h(Download, { class: 'mr-2 h-4 w-4' }),
         h('div', 'Download'),
       ]),
-    command: async () => {
+    command: async (): Promise<void> => {
       const path = layoutStore.path;
       const bucket = path.split('/')[1];
       const connection = layoutStore.selectedConnection;
@@ -129,12 +129,12 @@ const contextItemsObject = [
 
 const contextItemsDirectory = [
   {
-    render: () =>
+    render: (): VNode =>
       h('div', { class: 'w-44' }, [
         h(FolderOpen, { class: 'mr-2 h-4 w-4' }),
         h('div', 'Open'),
       ]),
-    command: () => {
+    command: (): void => {
       handleNavigation();
     },
   },
@@ -143,7 +143,7 @@ const contextItemsDirectory = [
 const contextItems =
   props.item.type === 'object' ? contextItemsObject : contextItemsDirectory;
 
-const toggleThreeDots = (event: MouseEvent) => {
+const toggleThreeDots = (event: MouseEvent): void => {
   createContextMenu(event, contextItems, {
     anchor: 'bottom',
     target: buttonElement.value,
@@ -156,7 +156,7 @@ const toggleThreeDots = (event: MouseEvent) => {
   });
 };
 
-const toggleRightClick = (event: MouseEvent) => {
+const toggleRightClick = (event: MouseEvent): void => {
   createContextMenu(event, contextItems, {
     anchor: 'bottom',
     target: itemElement.value,

@@ -19,7 +19,7 @@
       @click.self="selectConnection"
     >
       <div class="truncate" @click="selectConnection">
-        {{ connection.nickname }}
+        {{ connection.name }}
       </div>
       <div ref="button" class="flex">
         <Button
@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, h } from 'vue';
+import { ref, computed, h, VNode } from 'vue';
 import { Cloud, Ellipsis, Pencil, Trash } from 'lucide-vue-next';
 import { ipcInvoke } from '@/ipc';
 import { createContextMenu } from '@/contextMenu';
@@ -59,19 +59,19 @@ const selected = computed(
   () => layoutStore.selectedConnection?.id === props.connection.id,
 );
 
-const selectConnection = () => {
+const selectConnection = (): void => {
   layoutStore.selectedConnection = props.connection;
   layoutStore.path = '';
 };
 
 const contextItems = [
   {
-    render: () =>
+    render: (): VNode =>
       h('div', { class: 'w-44' }, [
         h(Pencil, { class: 'mr-2 h-4 w-4' }),
         h('div', 'Edit'),
       ]),
-    command: () => {
+    command: (): void => {
       layoutStore.setDialog({
         name: 'connection',
         data: props.connection,
@@ -79,12 +79,12 @@ const contextItems = [
     },
   },
   {
-    render: () =>
+    render: (): VNode =>
       h('div', { class: 'w-44' }, [
         h(Trash, { class: 'mr-2 h-4 w-4' }),
         h('div', 'Delete'),
       ]),
-    command: async () => {
+    command: async (): Promise<void> => {
       const { response } = await ipcInvoke('/dialog/showMessageBox', {
         message: 'Are you sure you want do delete this connection?',
         type: 'question',
@@ -98,7 +98,7 @@ const contextItems = [
   },
 ];
 
-const toggleThreeDots = (event: MouseEvent) => {
+const toggleThreeDots = (event: MouseEvent): void => {
   createContextMenu(event, contextItems, {
     anchor: 'bottom',
     target: button.value,
@@ -111,7 +111,7 @@ const toggleThreeDots = (event: MouseEvent) => {
   });
 };
 
-const toggleRightClick = (event: MouseEvent) => {
+const toggleRightClick = (event: MouseEvent): void => {
   createContextMenu(event, contextItems, {
     anchor: 'bottom',
     target: item.value,

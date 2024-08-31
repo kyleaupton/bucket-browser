@@ -103,7 +103,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import { nanoid } from 'nanoid';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import * as z from 'zod';
@@ -127,7 +126,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { NewConnection } from '@shared/types/connections';
+import { NewconnectionWithSecret } from '@shared/types/connections';
 import {
   useLayoutStore,
   useConnectionsStore,
@@ -178,36 +177,28 @@ const description = computed(() =>
 //
 // Form
 //
-const formSchema = toTypedSchema(
-  z.object({
-    id: z.string().default(nanoid),
-    nickname: z.string().min(1),
-    accessKeyId: z.string().min(1),
-    secretAccessKey: z.string().min(1),
-    config: z.object({
+const initialValues: NewconnectionWithSecret | undefined = connection.value
+  ? {
+      name: connection.value.name,
+      accessKeyId: connection.value.accessKeyId,
+      secretAccessKey: connection.value.secretAccessKey || '',
+      region: connection.value.region,
+      endpoint: connection.value.endpoint,
+      forcePathStyle: connection.value.forcePathStyle,
+    }
+  : undefined;
+
+const form = useForm<NewconnectionWithSecret>({
+  validationSchema: toTypedSchema(
+    z.object({
+      name: z.string().min(1),
+      accessKeyId: z.string().min(1),
+      secretAccessKey: z.string().min(1),
       region: z.string().min(1).default('us-east-1'),
       endpoint: z.string().min(1).default('https://s3.amazonaws.com'),
       forcePathStyle: z.boolean().default(false),
     }),
-  }),
-);
-
-const initialValues: NewConnection | undefined = connection.value
-  ? {
-      id: connection.value.id,
-      nickname: connection.value.nickname,
-      accessKeyId: connection.value.accessKeyId,
-      secretAccessKey: connection.value.secretAccessKey || '',
-      config: {
-        region: connection.value.config.region,
-        endpoint: connection.value.config.endpoint,
-        forcePathStyle: connection.value.config.forcePathStyle,
-      },
-    }
-  : undefined;
-
-const form = useForm({
-  validationSchema: formSchema,
+  ),
   initialValues,
 });
 
@@ -216,7 +207,7 @@ const form = useForm({
 //
 const onSubmit = form.handleSubmit(async (values) => {
   if (connection.value) {
-    await connectionsStore.editConnection(values);
+    await connectionsStore.editConnection(connection.value.id, values);
   } else {
     await connectionsStore.addConnection(values);
   }

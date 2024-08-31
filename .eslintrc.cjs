@@ -21,5 +21,6 @@ module.exports = {
 
     // Optional
     'vue/multi-word-component-names': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'error',
   },
 };

@@ -2,6 +2,7 @@ import {
   GetObjectCommandInput,
   PutObjectCommandInput,
 } from '@aws-sdk/client-s3';
+import { ConnectionId } from '@shared/types/connections';
 
 export type TransferType = 'upload' | 'download';
 
@@ -13,7 +14,7 @@ export type TransferStatus =
   | 'failed';
 
 interface TransferInputBase {
-  connectionId: string;
+  connectionId: ConnectionId;
 }
 
 export interface TransferInputUpload extends TransferInputBase {

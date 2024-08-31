@@ -85,7 +85,7 @@ const layoutStore = useLayoutStore();
 
 const macosTitlebar = computed(() => layoutStore.os === 'darwin');
 
-const getItemPath = (itemName: string) => {
+const getItemPath = (itemName: string): string => {
   const index = layoutStore.path.split('/').indexOf(itemName);
 
   return layoutStore.path
@@ -109,7 +109,7 @@ const selectItems = computed((): SelectableItems[] => {
 
   payload.push({
     type: 'connection',
-    label: layoutStore.selectedConnection.nickname,
+    label: layoutStore.selectedConnection.name,
     path: '<current_connection>',
   });
 
@@ -147,14 +147,16 @@ const selected = computed<string>({
   },
 });
 
-const goBack = () => {
+const goBack = (): void => {
   const path = layoutStore.path.split('/');
   path.pop();
   layoutStore.path = path.join('/');
 };
 
-const showTransfers = () => layoutStore.setDialog({ name: 'transfers' });
-const toggleSidebar = () => emitter.emit('toggle-sidebar');
+const showTransfers = (): void => layoutStore.setDialog({ name: 'transfers' });
+const toggleSidebar = (): void => {
+  emitter.emit('toggle-sidebar');
+};
 </script>
 
 <style scoped>

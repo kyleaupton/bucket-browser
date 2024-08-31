@@ -90,13 +90,13 @@ export default class TransferDownload implements Transfer {
     this.removeTransfer = this.removeTransfer.bind(this);
   }
 
-  get tempPath() {
+  get tempPath(): string {
     const dirname = path.dirname(this.downloadPath);
     const basename = path.basename(this.downloadPath);
     return path.join(dirname, `.download.${basename}`);
   }
 
-  private async initialize() {
+  private async initialize(): Promise<void> {
     if (!this.connection.client) {
       throw new Error('Connection client not initialized');
     }
@@ -124,7 +124,7 @@ export default class TransferDownload implements Transfer {
     this.downloadStream = response.Body as stream.Readable;
   }
 
-  private pipeStreams() {
+  private pipeStreams(): void {
     if (!this.downloadStream) {
       throw new Error('Download stream not found');
     }
@@ -136,7 +136,7 @@ export default class TransferDownload implements Transfer {
     }, 500);
 
     const progressStream = new stream.Transform({
-      transform: (chunk, encoding, callback) => {
+      transform: (chunk, encoding, callback): void => {
         this.downloadedBytes += chunk.length;
         this._downloadedBytes += chunk.length;
         callback(null, chunk);
@@ -156,35 +156,35 @@ export default class TransferDownload implements Transfer {
       });
   }
 
-  async start() {
+  async start(): Promise<void> {
     await this.initialize();
     this.pipeStreams();
   }
 
-  async cancel() {
+  async cancel(): Promise<void> {
     await fs.rm(this.tempPath);
     this.removeTransfer();
   }
 
-  pause() {
+  pause(): void {
     this.status = 'paused';
     this.cleanUp();
     this.sendUpdate();
   }
 
-  resume() {
+  resume(): void {
     if (this.status === 'paused') {
       this.start();
     }
   }
 
-  sendUpdate() {
+  sendUpdate(): void {
     BrowserWindow.getAllWindows().forEach((window) =>
       window.webContents.send('/transfers/update', this.serialize()),
     );
   }
 
-  cleanUp() {
+  cleanUp(): void {
     if (this.interval) {
       clearInterval(this.interval);
     }
@@ -196,12 +196,12 @@ export default class TransferDownload implements Transfer {
     }
   }
 
-  async finishTransfer() {
+  async finishTransfer(): Promise<void> {
     await fs.rename(this.tempPath, this.downloadPath);
     this.removeTransfer();
   }
 
-  removeTransfer() {
+  removeTransfer(): void {
     removeTransfer(this.id);
     this.cleanUp();
 

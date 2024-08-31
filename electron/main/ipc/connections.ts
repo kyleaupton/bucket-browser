@@ -7,12 +7,11 @@ import {
   addConnection,
   removeConnection,
 } from '@main/connections';
-import { getPassword, setPassword, deletePassword } from '@main/passwords';
+import { setPassword, deletePassword } from '@main/passwords';
 import db, { connections } from '@main/db';
 import {
-  PersistedConnection,
-  Connection,
-  NewConnection,
+  ConnectionId,
+  NewPersistedConnection,
   NewconnectionWithSecret,
 } from '@shared/types/connections';
 import { ListObjectsV2CommandInput } from '@aws-sdk/client-s3';
@@ -26,7 +25,7 @@ export const connectionsIpc = createIpcHandlers({
     // Add the secret access key to the keychain
     await setPassword(connection.name, connection.secretAccessKey);
 
-    const newConnection: NewConnection = {
+    const newConnection: NewPersistedConnection = {
       name: connection.name,
       region: connection.region,
       endpoint: connection.endpoint,
@@ -60,38 +59,18 @@ export const connectionsIpc = createIpcHandlers({
     addConnection(conn);
   },
 
-  '/connections/edit': async (event, connection: NewconnectionWithSecret) => {
-    // TODO: Edit in a way that doesn't just remove/add a new connection
-    await setPassword(connection.name, connection.secretAccessKey);
+  '/connections/remove': async (event, connectionId: ConnectionId) => {
+    const connection = getConnection(connectionId);
+    if (!connection) {
+      throw new Error('Connection not found');
+    }
 
-    removeConnection(connection.id);
-
-    const conn = new Connection(connection);
-    await conn.initialize();
-    addConnection(conn);
-
-    await db.update((data) => {
-      const index = data.connections.findIndex((c) => c.id === connection.id);
-
-      if (index !== -1) {
-        data.connections[index] = connection;
-      }
-    });
-  },
-
-  '/connections/remove': async (event, connectionId: string) => {
-    await keytar.deletePassword('bucket-browser', connectionId);
-
+    await deletePassword(connection.name);
+    await db.delete(connections).where(eq(connections.id, connectionId));
     removeConnection(connectionId);
-
-    await db.update((data) => {
-      data.connections = data.connections.filter(
-        (conn) => conn.id !== connectionId,
-      );
-    });
   },
 
-  '/connections/list-buckets': async (event, connectionId: string) => {
+  '/connections/list-buckets': async (event, connectionId: ConnectionId) => {
     const connection = getConnection(connectionId);
     if (!connection) {
       throw new Error('Connection not found');
@@ -102,7 +81,7 @@ export const connectionsIpc = createIpcHandlers({
 
   '/connections/list-objects': async (
     event,
-    connectionId: string,
+    connectionId: ConnectionId,
     input: ListObjectsV2CommandInput,
   ) => {
     const connection = getConnection(connectionId);

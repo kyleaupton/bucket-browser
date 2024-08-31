@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia';
 import { ipcInvoke } from '@/ipc';
-import { SerializedConnection, NewConnection } from '@shared/types/connections';
+import {
+  SerializedConnection,
+  NewconnectionWithSecret,
+  ConnectionId,
+} from '@shared/types/connections';
+import { serialize } from '@/utils';
 
 type State = {
   selectedConnection: string | undefined;
@@ -22,18 +27,22 @@ export const useConnectionsStore = defineStore('connections', {
       this.selectedConnection = connectionId;
     },
 
-    async addConnection(connection: NewConnection) {
-      await ipcInvoke('/connections/add', ...window.serialize(connection));
+    async addConnection(connection: NewconnectionWithSecret) {
+      await ipcInvoke('/connections/add', serialize(connection));
       await this.getConnections();
     },
 
-    async editConnection(connection: NewConnection) {
-      await ipcInvoke('/connections/edit', ...window.serialize(connection));
+    async editConnection(
+      id: ConnectionId,
+      connection: NewconnectionWithSecret,
+    ) {
+      await ipcInvoke('/connections/remove', id);
+      await ipcInvoke('/connections/add', serialize(connection));
       await this.getConnections();
     },
 
-    async removeConnection(connectionId: string) {
-      await ipcInvoke('/connections/remove', connectionId);
+    async removeConnection(id: ConnectionId) {
+      await ipcInvoke('/connections/remove', id);
       await this.getConnections();
     },
   },
