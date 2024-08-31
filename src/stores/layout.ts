@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia';
 import { ipcInvoke } from '@/ipc';
-import { SerializedConnection } from '@shared/types/connections';
+import { ConnectionId } from '@shared/types/connections';
 import { getExtension } from '@/utils';
 import { useBrowserStore, useTransfersStore } from '.';
 
 export type DialogConnection = {
   name: 'connection';
-  data?: SerializedConnection;
+  edit?: ConnectionId;
 };
 export type DialogTransfers = { name: 'transfers' };
 export type Dialog = DialogConnection | DialogTransfers;
@@ -14,7 +14,7 @@ export type Dialog = DialogConnection | DialogTransfers;
 type State = {
   // eslint-disable-next-line
   os: NodeJS.Platform | undefined;
-  selectedConnection: SerializedConnection | undefined;
+  selectedConnectionId: ConnectionId | undefined;
   path: string;
   dialog: Dialog | undefined;
   folderIcon: string;
@@ -26,7 +26,7 @@ type State = {
 export const useLayoutStore = defineStore('layout', {
   state: (): State => ({
     os: undefined,
-    selectedConnection: undefined,
+    selectedConnectionId: undefined,
     path: '',
     dialog: undefined,
     folderIcon: '',
@@ -94,7 +94,7 @@ export const useLayoutStore = defineStore('layout', {
     },
 
     async getFileIcons() {
-      const getImage = async (ext: string) => {
+      const getImage = async (ext: string): Promise<void> => {
         // If extension already has an icon, skip
         if (this.fileIcons[ext]) {
           return;

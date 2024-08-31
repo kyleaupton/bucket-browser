@@ -2,7 +2,7 @@
   <div class="h-full rounded-lg">
     <!-- No connection selected -->
     <div
-      v-if="!selectedConnection"
+      v-if="selectedConnectionId === undefined"
       class="h-full w-full flex justify-center items-center text-neutral-300"
     >
       <div>No Connection Selected</div>
@@ -24,9 +24,9 @@ import BrowserTable from './BrowserTable.vue';
 
 const browserStore = useBrowserStore();
 const layoutStore = useLayoutStore();
-const { path, selectedConnection } = storeToRefs(layoutStore);
+const { path, selectedConnectionId } = storeToRefs(layoutStore);
 
-watch(selectedConnection, () => {
+watch(selectedConnectionId, () => {
   browserStore.error = null;
   browserStore.fetchItems({ clearPageMarkers: true });
 });

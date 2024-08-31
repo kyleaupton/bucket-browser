@@ -78,10 +78,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useLayoutStore } from '@/stores';
+import { useLayoutStore, useConnectionsStore } from '@/stores';
 import { emitter } from '@/emitter';
 
 const layoutStore = useLayoutStore();
+const connectionsStore = useConnectionsStore();
 
 const macosTitlebar = computed(() => layoutStore.os === 'darwin');
 
@@ -103,13 +104,17 @@ interface SelectableItems {
 const selectItems = computed((): SelectableItems[] => {
   const payload: SelectableItems[] = [];
 
-  if (!layoutStore.selectedConnection) {
+  if (layoutStore.selectedConnectionId === undefined) {
     return payload;
   }
 
+  const connection = connectionsStore.getConnection(
+    layoutStore.selectedConnectionId,
+  );
+
   payload.push({
     type: 'connection',
-    label: layoutStore.selectedConnection.name,
+    label: connection.name,
     path: '<current_connection>',
   });
 
@@ -129,7 +134,7 @@ const selectItems = computed((): SelectableItems[] => {
 
 const selected = computed<string>({
   get: () => {
-    if (!layoutStore.selectedConnection) {
+    if (layoutStore.selectedConnectionId === undefined) {
       return '';
     } else if (!layoutStore.path) {
       return '<current_connection>';

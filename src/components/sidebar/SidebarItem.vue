@@ -56,11 +56,11 @@ const button = ref<HTMLElement>();
 const showContextMenu = ref(false);
 
 const selected = computed(
-  () => layoutStore.selectedConnection?.id === props.connection.id,
+  () => layoutStore.selectedConnectionId === props.connection.id,
 );
 
 const selectConnection = (): void => {
-  layoutStore.selectedConnection = props.connection;
+  layoutStore.selectedConnectionId = props.connection.id;
   layoutStore.path = '';
 };
 
@@ -74,7 +74,7 @@ const contextItems = [
     command: (): void => {
       layoutStore.setDialog({
         name: 'connection',
-        data: props.connection,
+        edit: props.connection.id,
       });
     },
   },

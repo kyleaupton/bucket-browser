@@ -109,11 +109,15 @@ const contextItemsObject = [
     command: async (): Promise<void> => {
       const path = layoutStore.path;
       const bucket = path.split('/')[1];
-      const connection = layoutStore.selectedConnection;
+      const connectionId = layoutStore.selectedConnectionId;
 
-      if (connection && props.item.type === 'object' && bucket) {
+      if (
+        connectionId !== undefined &&
+        props.item.type === 'object' &&
+        bucket
+      ) {
         await ipcInvoke('/transfers/add', {
-          connectionId: connection.id,
+          connectionId,
           downloadPath: `/Users/kyleupton/Downloads/${props.item.name}`,
           clientOptions: {
             Bucket: bucket,

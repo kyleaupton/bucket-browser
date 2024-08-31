@@ -17,6 +17,20 @@ export const useConnectionsStore = defineStore('connections', {
     connections: [],
   }),
 
+  getters: {
+    getConnection:
+      (state) =>
+      (id: ConnectionId): SerializedConnection => {
+        const connection = state.connections.find((c) => c.id === id);
+
+        if (!connection) {
+          throw new Error(`Connection with id ${id} not found`);
+        }
+
+        return connection;
+      },
+  },
+
   actions: {
     async getConnections() {
       this.connections = await ipcInvoke('/connections/get');
@@ -38,8 +52,8 @@ export const useConnectionsStore = defineStore('connections', {
     async removeConnection(connection: SerializedConnection) {
       // If the connection is selected, unselect it
       const layoutStore = useLayoutStore();
-      if (layoutStore.selectedConnection?.id === connection.id) {
-        layoutStore.selectedConnection = undefined;
+      if (layoutStore.selectedConnectionId === connection.id) {
+        layoutStore.selectedConnectionId = undefined;
       }
 
       await ipcInvoke('/connections/remove', connection.id);
