@@ -1,11 +1,11 @@
-import db, { connections as table_connections } from '@main/db';
+import db from '@main/db';
 import { ConnectionId, SerializedConnection } from '@shared/types/connections';
 import Connection from './Connection';
 
 const connections: Record<ConnectionId, Connection> = {};
 
 export const initializeConnections = async (): Promise<void> => {
-  const persisted = await db.select().from(table_connections);
+  const persisted = await db.selectFrom('connection').selectAll().execute();
   for (const connection of persisted) {
     const conn = new Connection(connection);
     addConnection(conn);

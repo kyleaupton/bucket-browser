@@ -1,16 +1,27 @@
 import path from 'node:path';
-import url from 'node:url';
 import { app } from 'electron';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
-import Database from 'better-sqlite3';
+import SQLite from 'better-sqlite3';
+import { Kysely, SqliteDialect } from 'kysely';
+import { Database } from './schema';
 
-const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+const dialect = new SqliteDialect({
+  database: new SQLite(path.join(app.getPath('userData'), 'db.sqlite')),
+});
 
-const sqlite = new Database(path.join(app.getPath('userData'), 'db.sqlite3'));
-const db = drizzle(sqlite);
+const db = new Kysely<Database>({
+  dialect,
+});
 
-migrate(db, { migrationsFolder: path.join(__dirname, 'drizzle') });
+await db.schema
+  .createTable('connection')
+  .ifNotExists()
+  .addColumn('id', 'integer', (col) => col.primaryKey().autoIncrement())
+  .addColumn('name', 'text', (col) => col.notNull())
+  .addColumn('accessKeyId', 'text', (col) => col.notNull())
+  .addColumn('region', 'text', (col) => col.notNull())
+  .addColumn('endpoint', 'text', (col) => col.notNull())
+  .addColumn('forcePathStyle', 'integer', (col) => col.notNull())
+  .execute();
 
 export default db;
 export * from './schema';

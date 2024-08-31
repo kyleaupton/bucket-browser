@@ -7,7 +7,7 @@
       </DialogHeader>
 
       <form class="flex flex-col gap-3" @submit="onSubmit">
-        <FormField v-slot="{ componentField }" name="nickname">
+        <FormField v-slot="{ componentField }" name="name">
           <FormItem>
             <FormLabel>Connection Name</FormLabel>
             <FormControl>
@@ -37,7 +37,7 @@
           </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="config.endpoint">
+        <FormField v-slot="{ componentField }" name="endpoint">
           <FormItem>
             <FormLabel>Endpoint</FormLabel>
             <FormControl>
@@ -51,7 +51,7 @@
           </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="config.region">
+        <FormField v-slot="{ componentField }" name="region">
           <FormItem>
             <FormLabel>Region</FormLabel>
             <FormControl>
@@ -66,18 +66,15 @@
           </FormItem>
         </FormField>
 
-        <FormField
-          v-slot="{ value, handleChange }"
-          name="config.forcePathStyle"
-        >
+        <FormField v-slot="{ value, handleChange }" name="forcePathStyle">
           <FormItem class="mt-2">
             <div class="flex items-center gap-4">
               <FormLabel>Force Path Style</FormLabel>
               <FormControl>
                 <Switch
                   class="!mt-0"
-                  :checked="value"
-                  @update:checked="handleChange"
+                  :checked="value === 1"
+                  @update:checked="(value) => handleChange(value ? 1 : 0)"
                 />
               </FormControl>
             </div>
@@ -196,7 +193,7 @@ const form = useForm<NewconnectionWithSecret>({
       secretAccessKey: z.string().min(1),
       region: z.string().min(1).default('us-east-1'),
       endpoint: z.string().min(1).default('https://s3.amazonaws.com'),
-      forcePathStyle: z.boolean().default(false),
+      forcePathStyle: z.number().default(0),
     }),
   ),
   initialValues,

@@ -1,18 +1,16 @@
-import { connections } from '@main/db';
+import { Selectable } from 'kysely';
+import { ConnectionTable } from '@main/db';
 
-/** Type that get's stored in the database to represent a connection */
-export type PersistedConnection = typeof connections.$inferSelect;
+/** Type of connection that is stored in db */
+export type PersistedConnection = Selectable<ConnectionTable>;
 
-/** Type of a connections ID */
+/** Type of a connection's ID */
 export type ConnectionId = PersistedConnection['id'];
 
 /** Type of what a database intert needs for a new connection */
-export type NewPersistedConnection = Omit<
-  typeof connections.$inferInsert,
-  'id'
->;
+export type NewPersistedConnection = Omit<PersistedConnection, 'id'>;
 
-/** Type that the renderer should pass to main to create a new connection */
+/** Type the renderer should pass to main to create a new connection */
 export type NewconnectionWithSecret = NewPersistedConnection & {
   secretAccessKey: string;
 };

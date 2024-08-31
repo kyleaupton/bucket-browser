@@ -1,12 +1,14 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { Generated } from 'kysely';
 
-export const connections = sqliteTable('connections', {
-  id: integer('id').primaryKey(),
-  name: text('name').notNull(),
-  accessKeyId: text('access_key_id').notNull(),
+export interface Database {
+  connection: ConnectionTable;
+}
 
-  // Config
-  region: text('region').notNull(),
-  endpoint: text('endpoint').notNull(),
-  forcePathStyle: integer('force_path_style', { mode: 'boolean' }).notNull(),
-});
+export interface ConnectionTable {
+  id: Generated<number>;
+  name: string;
+  accessKeyId: string;
+  region: string;
+  endpoint: string;
+  forcePathStyle: number;
+}

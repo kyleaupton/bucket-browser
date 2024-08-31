@@ -1,15 +1,17 @@
 import { BrowserWindow } from 'electron';
-import keytar from 'keytar';
 import {
   S3Client,
   ListBucketsCommand,
+  ListBucketsCommandOutput,
   ListObjectsV2Command,
   ListObjectsV2CommandInput,
+  ListObjectsV2CommandOutput,
 } from '@aws-sdk/client-s3';
 import {
   SerializedConnection,
   PersistedConnection,
 } from '@shared/types/connections';
+import { getPassword } from '@main/passwords';
 
 /**
  * S3 Connection class
@@ -39,16 +41,13 @@ export default class Connection {
     // Config
     this.region = connection.region;
     this.endpoint = connection.endpoint;
-    this.forcePathStyle = connection.forcePathStyle;
+    this.forcePathStyle = connection.forcePathStyle === 1;
     // State
     this.error = undefined;
   }
 
-  async initialize() {
-    this.secretAccessKey = await keytar.getPassword(
-      'bucket-browser',
-      `${this.id}`,
-    );
+  async initialize(): Promise<void> {
+    this.secretAccessKey = await getPassword(this.name);
 
     if (this.secretAccessKey == null) {
       this.error = 'Secret access key not found';
@@ -67,7 +66,7 @@ export default class Connection {
     this.sendUpdate();
   }
 
-  async listBuckets() {
+  async listBuckets(): Promise<ListBucketsCommandOutput> {
     if (!this.client) {
       throw new Error('S3 Client not initialized');
     }
@@ -75,7 +74,9 @@ export default class Connection {
     return this.client.send(new ListBucketsCommand());
   }
 
-  async listObjects(input: ListObjectsV2CommandInput) {
+  async listObjects(
+    input: ListObjectsV2CommandInput,
+  ): Promise<ListObjectsV2CommandOutput> {
     if (!this.client) {
       throw new Error('S3 Client not initialized');
     }
@@ -91,12 +92,12 @@ export default class Connection {
       secretAccessKey: this.secretAccessKey,
       region: this.region,
       endpoint: this.endpoint,
-      forcePathStyle: this.forcePathStyle,
+      forcePathStyle: this.forcePathStyle === true ? 1 : 0,
       error: this.error,
     };
   }
 
-  sendUpdate() {
+  sendUpdate(): void {
     BrowserWindow.getAllWindows().forEach((win) => {
       win.webContents.send('/connections/update', this.serialize());
     });

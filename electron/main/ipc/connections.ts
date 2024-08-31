@@ -1,5 +1,4 @@
 import { createIpcHandlers } from 'typed-electron-ipc';
-import { eq } from 'drizzle-orm';
 import Connection from '@main/connections/Connection';
 import {
   getConnection,
@@ -8,7 +7,7 @@ import {
   removeConnection,
 } from '@main/connections';
 import { setPassword, deletePassword } from '@main/passwords';
-import db, { connections } from '@main/db';
+import db from '@main/db';
 import {
   ConnectionId,
   NewPersistedConnection,
@@ -34,27 +33,26 @@ export const connectionsIpc = createIpcHandlers({
     };
 
     // Add the connection to the database
-    const { lastInsertRowid } = await db
-      .insert(connections)
-      .values(newConnection);
+    const { insertId } = await db
+      .insertInto('connection')
+      .values(newConnection)
+      .executeTakeFirst();
 
-    if (typeof lastInsertRowid !== 'number') {
-      throw new Error(
-        "Newly added connection ID is not a number, it's a bigint",
-      );
+    if (!insertId) {
+      throw new Error('Failed to insert connection into database');
     }
 
-    // Get the connection we just added
+    // Cast the insertId to a number
+    // If insertId is a bigint, the user is doing too much
+    const id = Number(insertId);
+
     const persisted = await db
-      .select()
-      .from(connections)
-      .where(eq(connections.id, lastInsertRowid));
+      .selectFrom('connection')
+      .selectAll()
+      .where('id', '=', id)
+      .executeTakeFirstOrThrow();
 
-    if (persisted.length !== 1) {
-      throw new Error('Duplicate connection ID');
-    }
-
-    const conn = new Connection(persisted[0]);
+    const conn = new Connection(persisted);
     await conn.initialize();
     addConnection(conn);
   },
@@ -66,7 +64,7 @@ export const connectionsIpc = createIpcHandlers({
     }
 
     await deletePassword(connection.name);
-    await db.delete(connections).where(eq(connections.id, connectionId));
+    await db.deleteFrom('connection').where('id', '=', connectionId).execute();
     removeConnection(connectionId);
   },
 
