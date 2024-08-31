@@ -9,7 +9,8 @@
     </div>
 
     <!-- Error -->
-    <BrowserError v-if="browserStore.error" />
+    <BrowserError v-if="error" />
+    <BrowserEmpty v-else-if="!fetching && items.length === 0" />
 
     <BrowserTable v-else />
   </div>
@@ -20,11 +21,13 @@ import { watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useBrowserStore, useLayoutStore } from '@/stores';
 import BrowserError from './BrowserError.vue';
+import BrowserEmpty from './BrowserEmpty.vue';
 import BrowserTable from './BrowserTable.vue';
 
 const browserStore = useBrowserStore();
 const layoutStore = useLayoutStore();
 const { path, selectedConnectionId } = storeToRefs(layoutStore);
+const { error, fetching, items } = storeToRefs(browserStore);
 
 watch(selectedConnectionId, () => {
   browserStore.error = null;
