@@ -92,7 +92,7 @@ const contextItems = [
       });
 
       if (response === 0) {
-        await connectionsStore.removeConnection(props.connection.id);
+        await connectionsStore.removeConnection(props.connection);
       }
     },
   },
