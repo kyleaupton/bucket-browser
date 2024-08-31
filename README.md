@@ -32,14 +32,14 @@ A desktop app to browse S3 buckets
       - [ ] Linux
   - [x] Browser navigation controls
   - [x] Support pagination
-  - [ ] Clean up UI
-  - [ ] Error handling
+  - [x] Clean up UI
+  - [x] Error handling
 - [ ] Transfers
   - [ ] Create transfer infrastructure
   - [ ] Create `TransferUpload`
   - [x] Create `TransferDownload`
   - [x] Figure out how to send status updates to the UI
-  - [ ] Create UI for transfers
+  - [x] Create UI for transfers
   - [ ] Impliment pause, resume, cancel
     - [ ] Upload
     - [x] Download
@@ -53,9 +53,9 @@ A desktop app to browse S3 buckets
   - [x] ~~Figure out how to properly theme `PrimeVue`~~ (Removed PrimeVue in favor of Shadcn)
   - [ ] Windows window controls
 - [ ] CI/CD
-  - [ ] Get type checking hooked up
+  - [ ] Type check on CI
+  - [ ] ESLint check on CI
   - [ ] Write some tests
-  - [ ] Create GitHub CI action to check types and test on push
   - [ ] Create build script
   - [ ] Create S3 target to upload build artifacts to
   - [ ] Hook up auto-updater

@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="flex justify-between items-center p-2 border-t dark:border-neutral-700"
-  >
+  <div class="flex justify-between items-center p-2 border-t">
     <Button
       class="h-8 w-8"
       size="icon"
