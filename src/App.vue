@@ -5,6 +5,7 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import {
   useConnectionsStore,
   useLayoutStore,
@@ -15,22 +16,24 @@ import Main from '@/views/Main.vue';
 import Dialog from '@/components/dialog/Dialog.vue';
 import { serialize } from './utils';
 
-// For now just force dark mode
-document.documentElement.classList.add('dark');
+onMounted(async () => {
+  // For now just force dark mode
+  document.documentElement.classList.add('dark');
 
-const connectionsStore = useConnectionsStore();
-const layoutStore = useLayoutStore();
-const transfersStore = useTransfersStore();
+  const connectionsStore = useConnectionsStore();
+  const layoutStore = useLayoutStore();
+  const transfersStore = useTransfersStore();
 
-connectionsStore.getConnections();
-layoutStore.getStandardIcons();
-layoutStore.getOs();
-transfersStore.registerTransferEvents();
+  transfersStore.registerTransferEvents();
+  connectionsStore.getConnections();
+  layoutStore.getOs();
+  layoutStore.getStandardIcons();
 
-window.serialize = serialize;
+  window.serialize = serialize;
 
-window.onWindowState((state) => {
-  layoutStore.windowState = state;
+  window.onWindowState((state) => {
+    layoutStore.windowState = state;
+  });
 });
 </script>
 
