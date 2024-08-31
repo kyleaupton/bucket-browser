@@ -1,2 +1,2 @@
-# * text eol=lf
-# *.png binary # so docs/screenshot.png doesn't get corrupted
+* text eol=lf
+!*.png
