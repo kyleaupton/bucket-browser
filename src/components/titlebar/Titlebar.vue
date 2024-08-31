@@ -25,14 +25,6 @@
       >
         <ArrowLeft class="size-4" />
       </Button>
-      <Button
-        class="titlebar-nodrag h-8 w-8 flex-shrink-0"
-        variant="outline"
-        size="icon"
-        @click="goBack"
-      >
-        <ArrowRight class="size-4" />
-      </Button>
       <Select v-model="selected" :disabled="!selected">
         <SelectTrigger
           class="titlebar-nodrag h-8 disabled:opacity-100 disabled:cursor-default"
@@ -51,14 +43,8 @@
           </SelectGroup>
         </SelectContent>
       </Select>
-    </div>
-
-    <div
-      class="absolute flex gap-2 h-12 p-2 -m-2"
-      :class="[{ 'right-2': macosTitlebar }, { 'right-[148px]': winTitlebar }]"
-    >
       <Button
-        class="titlebar-nodrag h-8 w-8"
+        class="titlebar-nodrag h-8 w-8 flex-shrink-0"
         variant="outline"
         size="icon"
         @click="showTransfers"
@@ -73,7 +59,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { Menu, ArrowLeft, ArrowRight, ArrowLeftRight } from 'lucide-vue-next';
+import { Menu, ArrowLeft, ArrowLeftRight } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import {
   Select,
