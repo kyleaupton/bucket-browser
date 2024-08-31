@@ -10,7 +10,7 @@ import {
   useLayoutStore,
   useTransfersStore,
 } from '@/stores';
-import Titlebar from '@/components/Titlebar.vue';
+import Titlebar from '@/components/titlebar/Titlebar.vue';
 import Main from '@/views/Main.vue';
 import Dialog from '@/components/dialog/Dialog.vue';
 import { serialize } from './utils';
@@ -28,6 +28,10 @@ layoutStore.getOs();
 transfersStore.registerTransferEvents();
 
 window.serialize = serialize;
+
+window.onWindowState((state) => {
+  layoutStore.windowState = state;
+});
 </script>
 
 <style>

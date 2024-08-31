@@ -4,7 +4,7 @@
   >
     <div
       class="absolute flex gap-2 h-12 p-2 -m-2"
-      :class="{ 'left-[74px]': macosTitlebar }"
+      :class="[{ 'left-[74px]': macosTitlebar }, { 'left-2': winTitlebar }]"
     >
       <Button
         class="titlebar-nodrag h-8 w-8"
@@ -53,7 +53,10 @@
       </Select>
     </div>
 
-    <div class="absolute flex gap-2 right-2 h-12 p-2 -m-2">
+    <div
+      class="absolute flex gap-2 h-12 p-2 -m-2"
+      :class="[{ 'right-2': macosTitlebar }, { 'right-[148px]': winTitlebar }]"
+    >
       <Button
         class="titlebar-nodrag h-8 w-8"
         variant="outline"
@@ -63,6 +66,8 @@
         <ArrowLeftRight class="size-4" />
       </Button>
     </div>
+
+    <TitlebarWindowsControl v-if="winTitlebar" />
   </div>
 </template>
 
@@ -80,11 +85,13 @@ import {
 } from '@/components/ui/select';
 import { useLayoutStore, useConnectionsStore } from '@/stores';
 import { emitter } from '@/emitter';
+import TitlebarWindowsControl from './TitlebarWindowsControl.vue';
 
 const layoutStore = useLayoutStore();
 const connectionsStore = useConnectionsStore();
 
 const macosTitlebar = computed(() => layoutStore.os === 'darwin');
+const winTitlebar = computed(() => layoutStore.os === 'win32');
 
 const getItemPath = (itemName: string): string => {
   const index = layoutStore.path.split('/').indexOf(itemName);

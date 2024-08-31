@@ -54,6 +54,7 @@ async function createWindow() {
     minHeight,
     width: minWidth,
     height: minHeight,
+    frame: false,
     titleBarStyle: 'hiddenInset',
     trafficLightPosition: {
       x: 12,
@@ -62,6 +63,14 @@ async function createWindow() {
     webPreferences: {
       preload,
     },
+  });
+
+  win.on('maximize', () => {
+    win?.webContents.send('/window/state', 'maximized');
+  });
+
+  win.on('unmaximize', () => {
+    win?.webContents.send('/window/state', 'unmaximized');
   });
 
   if (VITE_DEV_SERVER_URL) {

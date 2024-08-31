@@ -1,4 +1,9 @@
-import { ipcInvoke, onTransferUpdate, onTransferRemove } from '@preload/index';
+import {
+  ipcInvoke,
+  onTransferUpdate,
+  onTransferRemove,
+  onWindowState,
+} from '@preload/index';
 import { serialize } from './utils';
 
 declare global {
@@ -7,5 +12,6 @@ declare global {
     serialize: typeof serialize;
     onTransferUpdate: typeof onTransferUpdate;
     onTransferRemove: typeof onTransferRemove;
+    onWindowState: typeof onWindowState;
   }
 }

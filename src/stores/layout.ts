@@ -21,6 +21,7 @@ type State = {
   bucketIcon: string;
   defaultIcon: string;
   fileIcons: Record<string, string>;
+  windowState: 'maximized' | 'unmaximized';
 };
 
 export const useLayoutStore = defineStore('layout', {
@@ -33,6 +34,7 @@ export const useLayoutStore = defineStore('layout', {
     bucketIcon: '',
     defaultIcon: '',
     fileIcons: {},
+    windowState: 'unmaximized',
   }),
 
   getters: {
