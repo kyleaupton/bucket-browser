@@ -5,7 +5,7 @@
       v-if="selectedConnectionId === undefined"
       class="h-full w-full flex justify-center items-center text-neutral-300"
     >
-      <div>No Connection Selected</div>
+      <div class="text-sm text-muted-foreground">No Connection Selected</div>
     </div>
 
     <!-- Error -->

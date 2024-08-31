@@ -6,16 +6,13 @@
       class="flex flex-col justify-center items-center gap-6 p-6 rounded-xl max-w-screen-sm bg-muted"
     >
       <!-- Title row -->
-      <div class="flex gap-2">
-        <i
-          class="pi pi-exclamation-circle text-destructive"
-          :style="{ fontSize: '1.5rem' }"
-        ></i>
-        <div>Something went wrong</div>
+      <div class="flex flex-col items-center gap-2">
+        <TriangleAlert class="text-destructive size-14" />
+        <div class="text-xl font-medium">Something went wrong</div>
       </div>
       <!-- Body row -->
       <div class="flex flex-col">
-        <div>Error: {{ message }}</div>
+        <div class="text-center">Error: {{ message }}</div>
       </div>
       <!-- Action row -->
       <div>
@@ -28,6 +25,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
+import { TriangleAlert } from 'lucide-vue-next';
 import { useBrowserStore, useLayoutStore } from '@/stores';
 import { Button } from '@/components/ui/button';
 
