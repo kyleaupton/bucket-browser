@@ -57,6 +57,39 @@ export const connectionsIpc = createIpcHandlers({
     addConnection(conn);
   },
 
+  '/connections/edit': async (
+    event,
+    connectionId: ConnectionId,
+    connection: NewconnectionWithSecret,
+  ) => {
+    await setPassword(connection.name, connection.secretAccessKey);
+    removeConnection(connectionId);
+
+    const newConnection: NewPersistedConnection = {
+      name: connection.name,
+      region: connection.region,
+      endpoint: connection.endpoint,
+      forcePathStyle: connection.forcePathStyle,
+      accessKeyId: connection.accessKeyId,
+    };
+
+    await db
+      .updateTable('connection')
+      .set(newConnection)
+      .where('id', '=', connectionId)
+      .execute();
+
+    const persisted = await db
+      .selectFrom('connection')
+      .selectAll()
+      .where('id', '=', connectionId)
+      .executeTakeFirstOrThrow();
+
+    const conn = new Connection(persisted);
+    await conn.initialize();
+    addConnection(conn);
+  },
+
   '/connections/remove': async (event, connectionId: ConnectionId) => {
     const connection = getConnection(connectionId);
     if (!connection) {

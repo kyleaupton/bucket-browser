@@ -36,8 +36,7 @@ export const useConnectionsStore = defineStore('connections', {
       id: ConnectionId,
       connection: NewconnectionWithSecret,
     ) {
-      await ipcInvoke('/connections/remove', id);
-      await ipcInvoke('/connections/add', serialize(connection));
+      await ipcInvoke('/connections/edit', id, serialize(connection));
       await this.getConnections();
     },
 
