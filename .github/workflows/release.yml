@@ -30,7 +30,7 @@ jobs:
 
       - name: Retrieve Release Version From `package.json`
         run: |
-          cd version
+          cd scripts
           node version.js >> $GITHUB_ENV
 
       - name: Validate Input Version Against `package.json`
