@@ -3,8 +3,6 @@ import { addTransfer, getTransfers } from '@main/transfers';
 import TransferDownload from '@main/transfers/TransferDownload';
 import TransferUpload from '@main/transfers/TransferUpload';
 import {
-  isTransferInputDownload,
-  isTransferInputUpload,
   TransferInputDownload,
   TransferInputUpload,
 } from '@shared/types/transfers';
@@ -21,20 +19,14 @@ export const transfersIpc = createIpcHandlers({
     );
   },
 
-  '/transfers/add': async (
-    event,
-    input: TransferInputDownload | TransferInputUpload,
-  ) => {
-    let transfer: TransferDownload | TransferUpload;
+  '/transfers/add/download': async (event, input: TransferInputDownload) => {
+    const transfer = new TransferDownload(input);
+    addTransfer(transfer);
+    return transfer.serialize();
+  },
 
-    if (isTransferInputDownload(input)) {
-      transfer = new TransferDownload(input);
-    } else if (isTransferInputUpload(input)) {
-      transfer = new TransferUpload(input);
-    } else {
-      throw new Error('Invalid transfer input');
-    }
-
+  '/transfers/add/upload': async (event, input: TransferInputUpload) => {
+    const transfer = new TransferUpload(input);
     addTransfer(transfer);
     return transfer.serialize();
   },
