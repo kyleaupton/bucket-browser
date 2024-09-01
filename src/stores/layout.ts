@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia';
 import { ipcInvoke } from '@/ipc';
-import { SerializedConnection } from '@shared/types/connections';
+import { ConnectionId } from '@shared/types/connections';
 import { getExtension } from '@/utils';
 import { useBrowserStore, useTransfersStore } from '.';
 
 export type DialogConnection = {
   name: 'connection';
-  data?: SerializedConnection;
+  edit?: ConnectionId;
 };
 export type DialogTransfers = { name: 'transfers' };
 export type Dialog = DialogConnection | DialogTransfers;
@@ -14,25 +14,27 @@ export type Dialog = DialogConnection | DialogTransfers;
 type State = {
   // eslint-disable-next-line
   os: NodeJS.Platform | undefined;
-  selectedConnection: SerializedConnection | undefined;
+  selectedConnectionId: ConnectionId | undefined;
   path: string;
   dialog: Dialog | undefined;
   folderIcon: string;
   bucketIcon: string;
   defaultIcon: string;
   fileIcons: Record<string, string>;
+  windowState: 'maximized' | 'unmaximized';
 };
 
 export const useLayoutStore = defineStore('layout', {
   state: (): State => ({
     os: undefined,
-    selectedConnection: undefined,
+    selectedConnectionId: undefined,
     path: '',
     dialog: undefined,
     folderIcon: '',
     bucketIcon: '',
     defaultIcon: '',
     fileIcons: {},
+    windowState: 'unmaximized',
   }),
 
   getters: {
@@ -82,19 +84,27 @@ export const useLayoutStore = defineStore('layout', {
     },
 
     async getStandardIcons() {
-      const res = await Promise.all([
-        ipcInvoke('/app/getBucketImage'),
-        ipcInvoke('/app/getFolderImage'),
-        ipcInvoke('/app/getObjectImage', 'foo'),
-      ]);
+      try {
+        this.bucketIcon = await ipcInvoke('/app/getBucketImage');
+      } catch (error) {
+        // Noop
+      }
 
-      this.bucketIcon = res[0];
-      this.folderIcon = res[1];
-      this.defaultIcon = res[2];
+      try {
+        this.folderIcon = await ipcInvoke('/app/getFolderImage');
+      } catch (error) {
+        // Noop
+      }
+
+      try {
+        this.defaultIcon = await ipcInvoke('/app/getObjectImage', 'foo.foo');
+      } catch (error) {
+        // Noop
+      }
     },
 
     async getFileIcons() {
-      const getImage = async (ext: string) => {
+      const getImage = async (ext: string): Promise<void> => {
         // If extension already has an icon, skip
         if (this.fileIcons[ext]) {
           return;

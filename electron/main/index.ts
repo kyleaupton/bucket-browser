@@ -1,10 +1,14 @@
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { autoUpdater } from 'electron-updater';
+import log from 'electron-log/main';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import os from 'node:os';
 
 import { initializeConnections } from '@main/connections';
 import '@main/ipc';
+
+log.initialize();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -43,7 +47,7 @@ let win: BrowserWindow | null = null;
 const preload = path.join(__dirname, '../preload/index.mjs');
 const indexHtml = path.join(RENDERER_DIST, 'index.html');
 
-async function createWindow() {
+const createWindow = async (): Promise<void> => {
   const minWidth = 800;
   const minHeight = 575;
 
@@ -54,6 +58,7 @@ async function createWindow() {
     minHeight,
     width: minWidth,
     height: minHeight,
+    frame: false,
     titleBarStyle: 'hiddenInset',
     trafficLightPosition: {
       x: 12,
@@ -62,6 +67,14 @@ async function createWindow() {
     webPreferences: {
       preload,
     },
+  });
+
+  win.on('maximize', () => {
+    win?.webContents.send('/window/state', 'maximized');
+  });
+
+  win.on('unmaximize', () => {
+    win?.webContents.send('/window/state', 'unmaximized');
   });
 
   if (VITE_DEV_SERVER_URL) {
@@ -84,11 +97,18 @@ async function createWindow() {
     return { action: 'deny' };
   });
   // win.webContents.on('will-navigate', (event, url) => { }) #344
-}
+};
 
 app.on('ready', () => {
+  log.info('App ready');
+
   initializeConnections();
   createWindow();
+
+  // Initialize the auto-updater
+  const updateLog = log.scope('auto-updater');
+  autoUpdater.logger = updateLog;
+  autoUpdater.checkForUpdatesAndNotify();
 });
 
 app.on('window-all-closed', () => {

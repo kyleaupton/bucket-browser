@@ -127,6 +127,7 @@ import { NewconnectionWithSecret } from '@shared/types/connections';
 import {
   useLayoutStore,
   useConnectionsStore,
+  useBrowserStore,
   Dialog as t_Dialog,
   DialogConnection,
 } from '@/stores';
@@ -159,14 +160,19 @@ const _dialog = computed(() => {
     | undefined;
 });
 
-const connection = computed(() => _dialog?.value?.data);
+const connectionIdToEdit = computed(() => _dialog?.value?.edit);
+const connectionToEdit = computed(() =>
+  connectionIdToEdit.value !== undefined
+    ? connectionsStore.getConnection(connectionIdToEdit.value)
+    : undefined,
+);
 
 const title = computed(() =>
-  connection.value ? 'Edit Connection' : 'New Connection',
+  connectionToEdit.value ? 'Edit Connection' : 'New Connection',
 );
 
 const description = computed(() =>
-  connection.value
+  connectionToEdit.value
     ? 'Edit the connection to an S3-compatible storage service.'
     : 'Create a new connection to an S3-compatible storage service.',
 );
@@ -174,16 +180,17 @@ const description = computed(() =>
 //
 // Form
 //
-const initialValues: NewconnectionWithSecret | undefined = connection.value
-  ? {
-      name: connection.value.name,
-      accessKeyId: connection.value.accessKeyId,
-      secretAccessKey: connection.value.secretAccessKey || '',
-      region: connection.value.region,
-      endpoint: connection.value.endpoint,
-      forcePathStyle: connection.value.forcePathStyle,
-    }
-  : undefined;
+const initialValues: NewconnectionWithSecret | undefined =
+  connectionToEdit.value
+    ? {
+        name: connectionToEdit.value.name,
+        accessKeyId: connectionToEdit.value.accessKeyId,
+        secretAccessKey: connectionToEdit.value.secretAccessKey || '',
+        region: connectionToEdit.value.region,
+        endpoint: connectionToEdit.value.endpoint,
+        forcePathStyle: connectionToEdit.value.forcePathStyle,
+      }
+    : undefined;
 
 const form = useForm<NewconnectionWithSecret>({
   validationSchema: toTypedSchema(
@@ -203,10 +210,16 @@ const form = useForm<NewconnectionWithSecret>({
 // Methods
 //
 const onSubmit = form.handleSubmit(async (values) => {
-  if (connection.value) {
-    await connectionsStore.editConnection(connection.value.id, values);
+  if (connectionToEdit.value) {
+    await connectionsStore.editConnection(connectionToEdit.value.id, values);
   } else {
     await connectionsStore.addConnection(values);
+  }
+
+  // If connection is selected, fetch items
+  if (layoutStore.selectedConnectionId === connectionToEdit.value?.id) {
+    const browserStore = useBrowserStore();
+    browserStore.fetchItems();
   }
 
   layoutStore.closeDialog();
@@ -215,6 +228,6 @@ const onSubmit = form.handleSubmit(async (values) => {
 
 <style>
 .connection-dialog {
-  max-height: calc(100vh - 2rem);
+  max-height: calc(100vh - 4rem);
 }
 </style>

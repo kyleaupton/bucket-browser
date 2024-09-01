@@ -3,6 +3,7 @@ import { appIpc } from './app';
 import { connectionsIpc } from './connections';
 import { dialogIpc } from './dialog';
 import { transfersIpc } from './transfers';
+import { windowIpc } from './window';
 
 const router = ipcRouter(
   {
@@ -10,6 +11,7 @@ const router = ipcRouter(
     ...connectionsIpc,
     ...dialogIpc,
     ...transfersIpc,
+    ...windowIpc,
   },
   {
     encodeErrors: true,

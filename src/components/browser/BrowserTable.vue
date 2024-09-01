@@ -2,12 +2,13 @@
   <div class="flex flex-col h-full overflow-hidden">
     <BrowserTableColumns />
     <BrowserTableItems />
-    <BrowserTablePagination v-if="browserStore.isTruncated" />
+    <BrowserTablePagination v-if="isTruncated" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
 import { OverlayScrollbars } from 'overlayscrollbars';
 import { useBrowserStore } from '@/stores';
 import BrowserTableColumns from './BrowserTableColumns.vue';
@@ -16,6 +17,7 @@ import BrowserTablePagination from './BrowserTablePagination.vue';
 import 'overlayscrollbars/overlayscrollbars.css';
 
 const browserStore = useBrowserStore();
+const { isTruncated } = storeToRefs(browserStore);
 
 onMounted(() => {
   const target = document.getElementById('browser-scroller-wrapper');

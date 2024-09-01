@@ -4,7 +4,7 @@
   >
     <div
       class="absolute flex gap-2 h-12 p-2 -m-2"
-      :class="{ 'left-[74px]': macosTitlebar }"
+      :class="[{ 'left-[74px]': macosTitlebar }, { 'left-2': winTitlebar }]"
     >
       <Button
         class="titlebar-nodrag h-8 w-8"
@@ -25,14 +25,6 @@
       >
         <ArrowLeft class="size-4" />
       </Button>
-      <Button
-        class="titlebar-nodrag h-8 w-8 flex-shrink-0"
-        variant="outline"
-        size="icon"
-        @click="goBack"
-      >
-        <ArrowRight class="size-4" />
-      </Button>
       <Select v-model="selected" :disabled="!selected">
         <SelectTrigger
           class="titlebar-nodrag h-8 disabled:opacity-100 disabled:cursor-default"
@@ -51,11 +43,8 @@
           </SelectGroup>
         </SelectContent>
       </Select>
-    </div>
-
-    <div class="absolute flex gap-2 right-2 h-12 p-2 -m-2">
       <Button
-        class="titlebar-nodrag h-8 w-8"
+        class="titlebar-nodrag h-8 w-8 flex-shrink-0"
         variant="outline"
         size="icon"
         @click="showTransfers"
@@ -63,12 +52,14 @@
         <ArrowLeftRight class="size-4" />
       </Button>
     </div>
+
+    <TitlebarWindowsControl v-if="winTitlebar" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { Menu, ArrowLeft, ArrowRight, ArrowLeftRight } from 'lucide-vue-next';
+import { Menu, ArrowLeft, ArrowLeftRight } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -78,12 +69,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useLayoutStore } from '@/stores';
+import { useLayoutStore, useConnectionsStore } from '@/stores';
 import { emitter } from '@/emitter';
+import TitlebarWindowsControl from './TitlebarWindowsControl.vue';
 
 const layoutStore = useLayoutStore();
+const connectionsStore = useConnectionsStore();
 
 const macosTitlebar = computed(() => layoutStore.os === 'darwin');
+const winTitlebar = computed(() => layoutStore.os === 'win32');
 
 const getItemPath = (itemName: string): string => {
   const index = layoutStore.path.split('/').indexOf(itemName);
@@ -103,13 +97,17 @@ interface SelectableItems {
 const selectItems = computed((): SelectableItems[] => {
   const payload: SelectableItems[] = [];
 
-  if (!layoutStore.selectedConnection) {
+  if (layoutStore.selectedConnectionId === undefined) {
     return payload;
   }
 
+  const connection = connectionsStore.getConnection(
+    layoutStore.selectedConnectionId,
+  );
+
   payload.push({
     type: 'connection',
-    label: layoutStore.selectedConnection.name,
+    label: connection.name,
     path: '<current_connection>',
   });
 
@@ -129,7 +127,7 @@ const selectItems = computed((): SelectableItems[] => {
 
 const selected = computed<string>({
   get: () => {
-    if (!layoutStore.selectedConnection) {
+    if (layoutStore.selectedConnectionId === undefined) {
       return '';
     } else if (!layoutStore.path) {
       return '<current_connection>';

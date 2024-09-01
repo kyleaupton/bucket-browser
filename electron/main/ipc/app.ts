@@ -8,8 +8,10 @@ export const appIpc = createIpcHandlers({
   },
 
   '/app/getFolderImage': async () => {
+    const path = process.platform === 'win32' ? 'C:\\Windows' : '/';
+
     return (
-      await nativeImage.createThumbnailFromPath('/', {
+      await nativeImage.createThumbnailFromPath(path, {
         height: 32,
         width: 32,
       })
@@ -17,11 +19,23 @@ export const appIpc = createIpcHandlers({
   },
 
   '/app/getBucketImage': async () => {
+    if (process.platform === 'darwin') {
+      return (
+        await nativeImage.createThumbnailFromPath(
+          '/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/GenericFileServerIcon.icns',
+          {
+            height: 32,
+            width: 32,
+          },
+        )
+      ).toDataURL();
+    }
+
     return (
-      await nativeImage.createThumbnailFromPath(
-        '/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/GenericFileServerIcon.icns',
-        { height: 32, width: 32 },
-      )
+      await nativeImage.createThumbnailFromPath('C:\\Windows', {
+        height: 32,
+        width: 32,
+      })
     ).toDataURL();
   },
 

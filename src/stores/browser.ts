@@ -2,7 +2,7 @@ import { CSSProperties } from 'vue';
 import { defineStore, storeToRefs } from 'pinia';
 import { ipcInvoke } from '@/ipc';
 import { Item } from '@/components/browser/utils';
-import { useLayoutStore } from './layout';
+import { useLayoutStore, useConnectionsStore } from '.';
 
 export interface Column {
   key: string;
@@ -131,10 +131,17 @@ export const useBrowserStore = defineStore('browser', {
         }
 
         const layoutStore = useLayoutStore();
-        const { selectedConnection, selectedBucket, selectedObject } =
+        const connectionsStore = useConnectionsStore();
+        const { selectedConnectionId, selectedBucket, selectedObject } =
           storeToRefs(layoutStore);
 
-        if (selectedConnection.value) {
+        // Clear any previous error
+        this.error = undefined;
+
+        if (selectedConnectionId.value) {
+          const connection = connectionsStore.getConnection(
+            selectedConnectionId.value,
+          );
           this.items = [];
           this.fetching = true;
           const payload: Item[] = [];
@@ -147,7 +154,7 @@ export const useBrowserStore = defineStore('browser', {
           if (!selectedBucket.value) {
             const res = await ipcInvoke(
               '/connections/list-buckets',
-              selectedConnection.value.id,
+              connection.id,
             );
 
             console.log(res);
@@ -165,7 +172,7 @@ export const useBrowserStore = defineStore('browser', {
           } else {
             const res = await ipcInvoke(
               '/connections/list-objects',
-              selectedConnection.value.id,
+              connection.id,
               {
                 Bucket: selectedBucket.value,
                 Prefix: selectedObject.value ? `${selectedObject.value}/` : '',

@@ -1,0 +1,55 @@
+# Build the app and create a release.
+
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        required: true
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Retrieve Release Version From `package.json`
+        run: |
+          cd scripts
+          node version.js
+
+      - name: Validate Input Version Against `package.json`
+        uses: actions/github-script@v3
+        with:
+          script: |
+            if (process.env.APP_VERSION !== '${{ inputs.version }}') {
+              core.setFailed('Input version and package.json version are not the same. Input version: ${{ inputs.version }} Package.json version: ${{ env.APP_VERSION }}')
+            } else {
+              core.setOutput('Versions check out')
+            }
+
+      - name: Build Release Files
+        run: npm run release
+        env:
+          CSC_LINK: build/apple-code-signing.p12
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.GH_READ_TOKEN }}
+          GITHUB_RELEASE_TOKEN: ${{ secrets.GH_RELEASE_TOKEN }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
