@@ -1,7 +1,7 @@
 {
   "name": "bucket-browser",
   "productName": "Bucket Browser",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "dist-electron/main/index.js",
   "description": "A desktop app to browse S3 buckets",
   "author": "Kyle Upton <kyleaupton@gmail.com>",
