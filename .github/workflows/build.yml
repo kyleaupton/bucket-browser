@@ -29,7 +29,8 @@ jobs:
       - name: Build Release Files
         run: npm run build
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_LINK: build/apple-code-signing.p12
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3

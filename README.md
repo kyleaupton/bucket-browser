@@ -2,10 +2,10 @@
 
 A desktop app to browse, upload, and download objects on S3-compatible storage services.
 
+<img src="https://raw.githubusercontent.com/kyleaupton/bucket-browser/main/docs/screenshot.png" />
+
 > [!NOTE]
 > This is still under active development. Check back soon for a v1 release!
-
-<img src="https://raw.githubusercontent.com/kyleaupton/bucket-browser/main/docs/screenshot.png" />
 
 ## About
 

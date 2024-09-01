@@ -1,5 +1,6 @@
 {
   "name": "bucket-browser",
+  "productName": "Bucket Browser",
   "version": "0.0.1",
   "main": "dist-electron/main/index.js",
   "description": "A desktop app to browse S3 buckets",
@@ -20,8 +21,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build && electron-builder --publish never",
-    "release": "vue-tsc --noEmit && vite build && electron-builder --publish always",
+    "build": "node scripts/build.js --build",
+    "release": "node scripts/build.js --build --release",
     "checkTypes": "npx vue-tsc --noEmit --p tsconfig.json",
     "preview": "vite preview",
     "postinstall": "electron-builder install-app-deps",
@@ -30,7 +31,6 @@
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.600.0",
     "@aws-sdk/lib-storage": "^3.600.0",
-    "@electron/rebuild": "^3.6.0",
     "@popperjs/core": "^2.11.8",
     "@rollup/plugin-alias": "^5.1.0",
     "@types/better-sqlite3": "^7.6.11",
@@ -44,6 +44,7 @@
     "autoprefixer": "^10.4.19",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "dotenv": "^16.4.5",
     "drizzle-kit": "^0.24.2",
     "electron": "^29.1.1",
     "electron-builder": "^24.13.3",
