@@ -17,9 +17,10 @@ config();
 const exec = (command, args, options) => {
   return new Promise((resolve, reject) => {
     // Need to do some weirdness to get `npx` to execute on windows. First we
-    // set `shell` to `true`, and also we change `npx` to `cmd.npx`.
+    // set `shell` to `true`, and also we change `npx` to `npx.cmd`.
     const _command =
       command === 'npx' && process.platform === 'win32' ? 'npx.cmd' : command;
+
     const child = spawn(_command, args, {
       stdio: 'inherit',
       shell: true,
@@ -99,7 +100,7 @@ const build = async ({ publish = false }) => {
     files: ['dist', 'dist-electron'],
     mac: {
       target: {
-        target: 'dmg',
+        target: 'default',
         arch: ['x64', 'arm64'],
       },
       artifactName: 'bucket-browser-macOS-${arch}-${version}.${ext}',
