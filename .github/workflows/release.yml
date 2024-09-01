@@ -29,7 +29,9 @@ jobs:
         run: npm install
 
       - name: Retrieve Release Version From `package.json`
-        run: echo "APP_VERSION=$(node scripts/version.js)" >> $GITHUB_ENV
+        run: |
+          cd version
+          node version.js >> $GITHUB_ENV
 
       - name: Validate Input Version Against `package.json`
         uses: actions/github-script@v3

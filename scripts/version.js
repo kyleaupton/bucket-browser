@@ -8,8 +8,10 @@ const { version } = JSON.parse(
   fs.readFileSync(path.resolve('package.json'), 'utf-8'),
 );
 
+const string = `APP_VERSION=${version}`
+
 if (process.platform === 'win32') {
-  process.stdout.write(version);
+  process.stdout.write(string);
 } else {
-  console.log(version);
+  console.log(string);
 }
