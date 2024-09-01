@@ -1,3 +1,4 @@
+import { app } from 'electron';
 import { createWriteStream, WriteStream } from 'fs';
 import fs from 'fs/promises';
 import path from 'path';
@@ -14,6 +15,7 @@ import {
 import Connection from '@main/connections/Connection';
 import { getConnection } from '@main/connections';
 import { exists, prettyEta } from '@main/utils';
+import { unusedFilename } from '@main/file-name';
 import Transfer from './Transfer';
 import { removeTransfer } from '.';
 
@@ -26,11 +28,11 @@ export default class TransferDownload implements Transfer {
   /**
    * Options to pass to the S3 client to download the object
    */
-  clientOptions: GetObjectCommandInput;
+  options: GetObjectCommandInput;
   /**
    * Path to save the downloaded file
    */
-  downloadPath: string;
+  downloadPath: string | undefined;
   /**
    * Name of the object to download
    */
@@ -65,15 +67,14 @@ export default class TransferDownload implements Transfer {
   interval: ReturnType<typeof setInterval> | undefined;
 
   constructor(input: TransferInputDownload) {
-    if (!input.clientOptions.Key) {
+    if (!input.options.Key) {
       throw new Error('Object key not found');
     }
 
     this.id = nanoid();
     this.status = 'queued';
-    this.clientOptions = input.clientOptions;
-    this.downloadPath = input.downloadPath;
-    this.name = input.clientOptions.Key.split('/').pop()!;
+    this.options = input.options;
+    this.name = input.options.Key.split('/').pop()!;
     this.totalBytes = 0;
     this.downloadedBytes = 0;
     this._downloadedBytes = 0;
@@ -91,6 +92,10 @@ export default class TransferDownload implements Transfer {
   }
 
   get tempPath(): string {
+    if (!this.downloadPath) {
+      throw new Error('Download path not found');
+    }
+
     const dirname = path.dirname(this.downloadPath);
     const basename = path.basename(this.downloadPath);
     return path.join(dirname, `.download.${basename}`);
@@ -104,14 +109,19 @@ export default class TransferDownload implements Transfer {
     this.status = 'initializing';
     this.sendUpdate();
 
+    // Get the download path
+    this.downloadPath = await unusedFilename(
+      path.join(app.getPath('downloads'), this.name),
+    );
+
     if (await exists(this.tempPath)) {
       const stats = await fs.stat(this.tempPath);
       this.downloadedBytes = stats.size;
-      this.clientOptions.Range = `bytes=${this.downloadedBytes}-`;
+      this.options.Range = `bytes=${this.downloadedBytes}-`;
     }
 
     const response = await this.connection.client.send(
-      new GetObjectCommand(this.clientOptions),
+      new GetObjectCommand(this.options),
     );
 
     if (!response.ContentLength || !response.Body) {
@@ -197,6 +207,10 @@ export default class TransferDownload implements Transfer {
   }
 
   async finishTransfer(): Promise<void> {
+    if (!this.downloadPath) {
+      throw new Error('Download path not found');
+    }
+
     await fs.rename(this.tempPath, this.downloadPath);
     this.removeTransfer();
   }

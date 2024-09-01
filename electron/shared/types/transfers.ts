@@ -19,12 +19,11 @@ interface TransferInputBase {
 
 export interface TransferInputUpload extends TransferInputBase {
   sourcePath: string;
-  clientOptions: PutObjectCommandInput;
+  options: PutObjectCommandInput;
 }
 
 export interface TransferInputDownload extends TransferInputBase {
-  downloadPath: string;
-  clientOptions: GetObjectCommandInput;
+  options: GetObjectCommandInput;
 }
 
 export type SerializedTransfer = {
@@ -39,16 +38,4 @@ export type SerializedTransfer = {
     speed: number;
     eta: string;
   };
-};
-
-export const isTransferInputUpload = (
-  item: TransferInputUpload | TransferInputDownload,
-): item is TransferInputUpload => {
-  return 'sourcePath' in item;
-};
-
-export const isTransferInputDownload = (
-  item: TransferInputUpload | TransferInputDownload,
-): item is TransferInputDownload => {
-  return 'downloadPath' in item;
 };

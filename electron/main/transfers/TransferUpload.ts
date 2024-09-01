@@ -10,12 +10,12 @@ import Transfer from './Transfer';
 export default class TransferUpload implements Transfer {
   id: string;
   status: TransferStatus;
-  clientOptions: PutObjectCommandInput;
+  options: PutObjectCommandInput;
 
   constructor(input: TransferInputUpload) {
     this.id = nanoid();
     this.status = 'queued';
-    this.clientOptions = input.clientOptions;
+    this.options = input.options;
   }
 
   start() {}
@@ -31,7 +31,7 @@ export default class TransferUpload implements Transfer {
   serialize(): SerializedTransfer {
     return {
       id: this.id,
-      name: this.clientOptions.Key || 'Unknown Name',
+      name: this.options.Key || 'Unknown Name',
       type: 'upload' as const,
       status: this.status,
       progress: {

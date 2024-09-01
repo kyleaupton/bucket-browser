@@ -1,9 +1,5 @@
 import { defineStore } from 'pinia';
-import {
-  SerializedTransfer,
-  TransferInputDownload,
-  TransferInputUpload,
-} from '@shared/types/transfers';
+import { SerializedTransfer } from '@shared/types/transfers';
 import { ipcInvoke } from '@/ipc';
 import { useLayoutStore } from '.';
 
@@ -47,10 +43,6 @@ export const useTransfersStore = defineStore('transfers', {
   actions: {
     async getTransfers() {
       this.transfers = await ipcInvoke('/transfers/get');
-    },
-
-    async addTransfer(input: TransferInputUpload | TransferInputDownload) {
-      await ipcInvoke('/transfers/add', input);
     },
 
     updateTransfer(transfer: SerializedTransfer) {

@@ -116,10 +116,9 @@ const contextItemsObject = [
         props.item.type === 'object' &&
         bucket
       ) {
-        await ipcInvoke('/transfers/add', {
+        await ipcInvoke('/transfers/add/download', {
           connectionId,
-          downloadPath: `/Users/kyleupton/Downloads/${props.item.name}`,
-          clientOptions: {
+          options: {
             Bucket: bucket,
             Key: props.item.key,
           },
