@@ -1,10 +1,13 @@
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import log from 'electron-log/main';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import os from 'node:os';
 
 import { initializeConnections } from '@main/connections';
 import '@main/ipc';
+
+log.initialize();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -96,6 +99,8 @@ async function createWindow() {
 }
 
 app.on('ready', () => {
+  log.info('App ready');
+
   initializeConnections();
   createWindow();
 });
