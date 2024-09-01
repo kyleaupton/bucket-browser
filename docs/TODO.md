@@ -1,0 +1,51 @@
+## TODO
+
+- [x] Connection CRUD
+  - [x] Add ability to create new connection
+  - [x] Add ability to edit existing connection
+  - [x] Store access secrets in key store (use `Keytar` package)
+  - [x] Make access secret input a password input
+- [ ] Connection browsing
+  - [x] List buckets
+  - [x] List objects
+  - [x] Bucket/object traversal
+  - [ ] OS native filesystem icons
+    - [x] Spicific file icons
+      - [x] Mac
+      - [x] Windows
+      - [x] Linux
+    - [x] Folder icon
+      - [x] Mac
+      - [x] Windows
+      - [ ] Linux
+    - [ ] Bucket Icon
+      - [x] Mac
+      - [x] Windows (Just reusing the folder icon for now)
+      - [ ] Linux
+  - [x] Browser navigation controls
+  - [x] Support pagination
+  - [x] Clean up UI
+  - [x] Error handling
+- [ ] Transfers
+  - [x] Create transfer infrastructure
+  - [ ] Create `TransferUpload`
+  - [x] Create `TransferDownload`
+  - [x] Figure out how to send status updates to the UI
+  - [x] Create UI for transfers
+  - [ ] Impliment pause, resume, cancel
+    - [ ] Upload
+    - [x] Download
+  - [ ] Add logic for read/write vs. just read
+  - [ ] Support folder downloads
+  - [ ] Support folder uploads
+  - [ ] Add conformation before transfers for budgetary reasons
+- [ ] UI
+  - [ ] Finish light mode colors
+  - [x] ~~Figure out how to properly theme `PrimeVue`~~ (Removed PrimeVue in favor of Shadcn)
+  - [x] Windows window controls
+- [ ] CI/CD
+  - [ ] Type check on CI
+  - [ ] ESLint check on CI
+  - [ ] Write some tests
+  - [x] Create build script
+  - [x] Hook up auto-updater
