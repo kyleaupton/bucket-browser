@@ -1,4 +1,5 @@
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import log from 'electron-log/main';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -46,7 +47,7 @@ let win: BrowserWindow | null = null;
 const preload = path.join(__dirname, '../preload/index.mjs');
 const indexHtml = path.join(RENDERER_DIST, 'index.html');
 
-async function createWindow() {
+const createWindow = async (): Promise<void> => {
   const minWidth = 800;
   const minHeight = 575;
 
@@ -96,13 +97,18 @@ async function createWindow() {
     return { action: 'deny' };
   });
   // win.webContents.on('will-navigate', (event, url) => { }) #344
-}
+};
 
 app.on('ready', () => {
   log.info('App ready');
 
   initializeConnections();
   createWindow();
+
+  // Initialize the auto-updater
+  const updateLog = log.scope('auto-updater');
+  autoUpdater.logger = updateLog;
+  autoUpdater.checkForUpdatesAndNotify();
 });
 
 app.on('window-all-closed', () => {

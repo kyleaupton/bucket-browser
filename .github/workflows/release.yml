@@ -1,0 +1,47 @@
+# Build the app and create a release.
+
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        required: true
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Retrieve Release Version From `package.json`
+        run: echo "APP_VERSION=$(node -e "console.log(JSON.parse(fs.readFileSync(path.resolve('./package.json'), 'utf-8')).version)")" >> $GITHUB_ENV
+
+      - name: Validate Input Version Against `package.json`
+        uses: actions/github-script@v3
+        with:
+          script: |
+            if (process.env.APP_VERSION !== '${{ inputs.version }}') {
+              core.setFailed('Input version and package.json version are not the same. Input version: ${{ inputs.version }} Package.json version: ${{ env.APP_VERSION }}')
+            } else {
+              core.setOutput('Versions check out')
+            }
+
+      - name: Build Release Files
+        run: npm run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

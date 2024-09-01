@@ -20,7 +20,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build && electron-builder",
+    "build": "vue-tsc --noEmit && vite build && electron-builder --publish never",
+    "release": "vue-tsc --noEmit && vite build && electron-builder --publish always",
     "checkTypes": "npx vue-tsc --noEmit --p tsconfig.json",
     "preview": "vite preview",
     "postinstall": "electron-builder install-app-deps",
@@ -47,6 +48,7 @@
     "electron": "^29.1.1",
     "electron-builder": "^24.13.3",
     "electron-log": "^5.1.7",
+    "electron-updater": "^6.2.1",
     "eslint": "8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
