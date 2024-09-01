@@ -22,7 +22,7 @@
   "scripts": {
     "dev": "vite",
     "build": "node scripts/build.js --build",
-    "release": "node scripts/build.js --build --release",
+    "release": "node scripts/build.js --build --publish",
     "checkTypes": "npx vue-tsc --noEmit --p tsconfig.json",
     "preview": "vite preview",
     "postinstall": "electron-builder install-app-deps",

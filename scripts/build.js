@@ -18,8 +18,13 @@ const exec = (command, args, options) => {
   return new Promise((resolve, reject) => {
     // Need to do some weirdness to get `npx` to execute on windows. First we
     // set `shell` to `true`, and also we change `npx` to `cmd.npx`.
-    const _command = command === 'npx' && process.platform === 'win32' ? 'npx.cmd' : command
-    const child = spawn(_command, args, { stdio: 'inherit', shell: true, ...options });
+    const _command =
+      command === 'npx' && process.platform === 'win32' ? 'npx.cmd' : command;
+    const child = spawn(_command, args, {
+      stdio: 'inherit',
+      shell: true,
+      ...options,
+    });
 
     child.on('close', (code) => {
       if (code === 0) {
@@ -58,7 +63,10 @@ const build = async ({ publish = false }) => {
   //
   // Env validation
   //
-  if (process.platform === 'darwin' && (!process.env.CSC_LINK || !process.env.CSC_KEY_PASSWORD)) {
+  if (
+    process.platform === 'darwin' &&
+    (!process.env.CSC_LINK || !process.env.CSC_KEY_PASSWORD)
+  ) {
     throw Error('Missing code signing env variable(s)');
   }
 
