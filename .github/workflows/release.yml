@@ -43,13 +43,23 @@ jobs:
               core.setOutput('Versions check out')
             }
 
-      - name: Build Release Files
+      - name: Build Release Files macOS
         run: npm run release
+        if: runner.os == 'macos'
         env:
-          CSC_LINK: build/apple-code-signing.p12
-          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.GH_READ_TOKEN }}
           GITHUB_RELEASE_TOKEN: ${{ secrets.GH_RELEASE_TOKEN }}
+          # Code signing
+          CSC_LINK: build/apple-code-signing.p12
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          # Apple notarization
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+
+      - name: Build Release Files non-macOS
+        run: npm run release
+        if: runner.os != 'macos'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_READ_TOKEN }}
+          GITHUB_RELEASE_TOKEN: ${{ secrets.GH_RELEASE_TOKEN }}

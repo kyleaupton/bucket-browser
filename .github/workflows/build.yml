@@ -26,12 +26,17 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Build Release Files
+      - name: Build Release Files macOS
         run: npm run build
+        if: runner.os == 'macos'
         env:
           CSC_LINK: build/apple-code-signing.p12
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
 
+      - name: Build Release Files non-macOS
+        run: npm run release
+        if: runner.os != 'macos'
+  
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:

@@ -64,6 +64,18 @@ const build = async ({ publish = false }) => {
   //
   // Env validation
   //
+
+  // Github token for publishing + checking for updates.
+  // Only needed when publishing.
+  if (
+    publish &&
+    (!process.env.GITHUB_RELEASE_TOKEN || !process.env.GITHUB_TOKEN)
+  ) {
+    throw Error('Missing GITHUB_RELEASE_TOKEN or GITHUB_TOKEN env variable');
+  }
+
+  // Code signing env vars.
+  // Only the macOS app is code signed, and it's always signed regardless of `publish`.
   if (
     process.platform === 'darwin' &&
     (!process.env.CSC_LINK || !process.env.CSC_KEY_PASSWORD)
@@ -71,11 +83,21 @@ const build = async ({ publish = false }) => {
     throw Error('Missing code signing env variable(s)');
   }
 
+  // If we're building anything other than the macOS app, and
+  // the CSC env vars are set, we should throw an error.
+  if (
+    process.platform !== 'darwin' &&
+    (process.env.CSC_LINK || process.env.CSC_KEY_PASSWORD)
+  ) {
+    throw Error('Code signing env variables are only for macOS');
+  }
+
+  // Notarizing env vars.
+  // Only the macOS app is notarized, and it's ONLY notarized when publishing.
   if (
     publish &&
     process.platform === 'darwin' &&
-    (!process.env.GITHUB_TOKEN ||
-      !process.env.APPLE_ID ||
+    (!process.env.APPLE_ID ||
       !process.env.APPLE_APP_SPECIFIC_PASSWORD ||
       !process.env.APPLE_TEAM_ID)
   ) {
