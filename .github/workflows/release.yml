@@ -31,7 +31,7 @@ jobs:
       - name: Retrieve Release Version From `package.json`
         run: |
           cd scripts
-          node version.js >> $GITHUB_ENV
+          node version.js
 
       - name: Validate Input Version Against `package.json`
         uses: actions/github-script@v3
