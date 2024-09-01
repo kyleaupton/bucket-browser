@@ -60,22 +60,30 @@ export const connectionsIpc = createIpcHandlers({
   '/connections/edit': async (
     event,
     connectionId: ConnectionId,
-    connection: NewconnectionWithSecret,
+    newConnection: NewconnectionWithSecret,
   ) => {
-    await setPassword(connection.name, connection.secretAccessKey);
+    const currentPersisted = await db
+      .selectFrom('connection')
+      .selectAll()
+      .where('id', '=', connectionId)
+      .executeTakeFirstOrThrow();
+
+    await deletePassword(currentPersisted.name);
+    await setPassword(newConnection.name, newConnection.secretAccessKey);
+
     removeConnection(connectionId);
 
-    const newConnection: NewPersistedConnection = {
-      name: connection.name,
-      region: connection.region,
-      endpoint: connection.endpoint,
-      forcePathStyle: connection.forcePathStyle,
-      accessKeyId: connection.accessKeyId,
+    const newPersisted: NewPersistedConnection = {
+      name: newConnection.name,
+      region: newConnection.region,
+      endpoint: newConnection.endpoint,
+      forcePathStyle: newConnection.forcePathStyle,
+      accessKeyId: newConnection.accessKeyId,
     };
 
     await db
       .updateTable('connection')
-      .set(newConnection)
+      .set(newPersisted)
       .where('id', '=', connectionId)
       .execute();
 
