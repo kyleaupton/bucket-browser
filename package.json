@@ -47,7 +47,7 @@
     "dotenv": "^16.4.5",
     "drizzle-kit": "^0.24.2",
     "electron": "^32.0.1",
-    "electron-builder": "24.6.3",
+    "electron-builder": "24.13.3",
     "electron-log": "^5.1.7",
     "electron-updater": "^6.2.1",
     "eslint": "8.57.0",
