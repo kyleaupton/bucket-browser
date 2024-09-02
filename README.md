@@ -10,10 +10,10 @@ A desktop app to browse, upload, and download objects on S3-compatible storage s
 
 ## About
 
-This Electron.js app provides an easy way to interact with S3-compatible storage services. It allows you to create connections to storage providers by specifying the endpoint, region, access key, and secret key. Once connected you can browse through files, as well as ~~upload~~ (coming soon) and download files directly from the app.
-
 > [!WARNING]
 > Please note that this application has not yet reached its version 1.0 milestone. As such, you should expect to encounter bugs and incomplete features. Please open an issue, or better yet, a PR, if you encounter any bugs.
+
+This Electron.js app provides an easy way to interact with S3-compatible storage services. It allows you to create connections to storage providers by specifying the endpoint, region, access key, and secret key. Once connected you can browse through files, as well as ~~upload~~ (coming soon) and download files directly from the app.
 
 ## License
 
